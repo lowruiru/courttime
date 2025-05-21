@@ -152,6 +152,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
                 className="h-4"
               />
             </div>
+            </div>
 
         {/* Location */}
         <div className="space-y-1">
@@ -258,7 +259,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
             className="py-2"
           />
         </div>
-        
+        </div>
         
           </div>
           <Slider
