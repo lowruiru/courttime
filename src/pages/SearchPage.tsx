@@ -125,7 +125,7 @@ const SearchPage = () => {
         <div className="mb-2 pt-2 text-center">
           <h1 className="text-xl md:text-2xl font-bold mb-1">Find Tennis Instructors in Singapore</h1>
           <p className="text-xs text-muted-foreground md:w-2/3 mx-auto">
-            Find tennis instructors at your preferred location, time, and budget.
+            Select your preferred location, time, and budget.
           </p>
         </div>
         
