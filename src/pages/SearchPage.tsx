@@ -40,10 +40,10 @@ const SearchPage = () => {
         if (instructor.fee > filters.budget) return;
         
         // Filter by location if specified
-        if (filters.location && !instructor.location.includes(filters.location)) return;
+        if (filters.location && filters.location !== "all_locations" && !instructor.location.includes(filters.location)) return;
         
         // Filter by level if specified
-        if (filters.level && !instructor.levels.includes(filters.level)) return;
+        if (filters.level && filters.level !== "all_levels" && !instructor.levels.includes(filters.level)) return;
         
         // Filter by court availability if needed
         if (filters.needsCourt && !instructor.providesOwnCourt) return;

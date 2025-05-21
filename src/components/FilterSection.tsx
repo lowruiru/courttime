@@ -59,7 +59,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
               <SelectValue placeholder="Select location" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Any Location</SelectItem>
+              <SelectItem value="all_locations">Any Location</SelectItem>
               {Locations.map((location) => (
                 <SelectItem key={location} value={location}>
                   {location}
@@ -97,7 +97,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
               <SelectValue placeholder="Select level" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Any Level</SelectItem>
+              <SelectItem value="all_levels">Any Level</SelectItem>
               {Levels.map((level) => (
                 <SelectItem key={level} value={level}>
                   {level}
