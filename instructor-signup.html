@@ -7,11 +7,12 @@
   <style>
     body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 0; }
     .container { max-width: 400px; margin: 40px auto; background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);}
-    h2 { text-align: center; }
-    label { display: block; margin-top: 16px; }
-    input, textarea, select { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; }
-    button { margin-top: 20px; width: 100%; padding: 10px; background: #007bff; color: #fff; border: none; border-radius: 4px; font-size: 16px; }
-    button:hover { background: #0056b3; }
+    h2 { text-align: center; color: #1e5631; }
+    label { display: block; margin-top: 16px; color: #1e5631; font-size: 14px; }
+    input, textarea { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #1e5631; border-radius: 4px; font-size: 14px; }
+    button { margin-top: 20px; width: 100%; padding: 10px; background: #1e5631; color: #fff; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+    button:hover { background: #a4de02; color: #1e5631; }
+    .success { color: #1e5631; text-align: center; margin-top: 16px; }
   </style>
 </head>
 <body>
@@ -19,33 +20,20 @@
     <h2>Instructor Sign Up</h2>
     <form id="instructor-signup-form">
       <label for="name">Full Name</label>
-      <input type="text" id="name" name="name" required>
+      <input type="text" id="name" name="name" required autocomplete="name">
 
-      <label for="email">Email Address</label>
-      <input type="email" id="email" name="email" required>
-
-      <label for="phone">Phone Number</label>
-      <input type="tel" id="phone" name="phone" required>
-
-      <label for="experience">Years of Experience</label>
-      <input type="number" id="experience" name="experience" min="0" required>
-
-      <label for="certification">Certification(s)</label>
-      <input type="text" id="certification" name="certification">
-
-      <label for="bio">Short Bio</label>
-      <textarea id="bio" name="bio" rows="3"></textarea>
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required autocomplete="email">
 
       <button type="submit">Sign Up</button>
     </form>
-    <div id="signup-success" style="display:none; color:green; text-align:center; margin-top:16px;">
+    <div id="signup-success" class="success" style="display:none;">
       Thank you for signing up! We will contact you soon.
     </div>
   </div>
   <script>
     document.getElementById('instructor-signup-form').addEventListener('submit', function(e) {
       e.preventDefault();
-      // Here you would send the form data to your backend
       document.getElementById('instructor-signup-form').style.display = 'none';
       document.getElementById('signup-success').style.display = 'block';
     });
