@@ -125,6 +125,14 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
                   initialFocus
                   className={cn("p-3 pointer-events-auto")}
                 />
+                <Calendar
+  mode="single"
+  selected={filters.date}
+  onSelect={handleDateChange}
+  initialFocus
+  className={cn("p-3 pointer-events-auto")}
+/>
+
               </PopoverContent>
             </Popover>
             

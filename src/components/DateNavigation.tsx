@@ -41,6 +41,12 @@ const DateNavigation = ({ currentDate, onDateChange }: DateNavigationProps) => {
   const isCurrentDate = (date: Date) => {
     return currentDate && isSameDay(date, currentDate);
   };
+
+  const handleDateChange = (date: Date | undefined) => {
+  const newFilters = { ...filters, date };
+  setFilters(newFilters);
+  onFilterChange(newFilters);
+};
   
   return (
     <div>
