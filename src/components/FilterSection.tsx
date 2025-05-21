@@ -90,22 +90,6 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
       
       <div className="grid grid-cols-5 gap-3">
 
-        {/* Instructor Name Filter */}
-        <div className="space-y-1 col-span-1">
-          <Label htmlFor="instructorName" className="text-xs">Instructor Name</Label>
-          <Input
-            id="instructorName"
-            type="text"
-            placeholder="e.g. John Tan"
-            value={instructorName}
-            onChange={e => setInstructorName(e.target.value)}
-            className="h-8 text-xs"
-          />
-        </div>
-
-
-
-
 {/* Date Selection */}
         <div className="space-y-1">
           <Label htmlFor="date" className="text-xs">Available Dates</Label>
