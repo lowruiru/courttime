@@ -40,6 +40,14 @@ const InstructorSignup: React.FC = () => {
           >
             Sign Up
           </button>
+        <div className="mt-4 w-full">
+            <Link
+              to="/"
+              className="block text-center px-4 py-2 border border-tennis-green text-tennis-green rounded hover:bg-tennis-green hover:text-white transition"
+            >
+              Back to Homepage
+            </Link>
+          </div>
         </form>
       ) : (
         <div className="text-tennis-green text-center mt-6">
