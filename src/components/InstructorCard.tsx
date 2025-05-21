@@ -50,11 +50,33 @@ const InstructorCard = ({ instructor, timeSlot }: InstructorCardProps) => {
                   <span className="text-sm font-medium">{instructor.rating.toFixed(1)}</span>
                 </div>
               </div>
-              <div className="text-right mt-2 md:mt-0">
+              <div className="text-right mt-2 md:mt-0 flex flex-col items-end">
                 <p className="font-semibold text-tennis-green">S${instructor.fee}/hr</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground mb-2">
                   {instructor.providesOwnCourt ? "Provides court" : "Requires your court"}
                 </p>
+                
+                {/* Action Buttons */}
+                <div className="flex gap-2">
+                  <Button 
+                    className="bg-tennis-green hover:bg-tennis-green/90 py-1 px-3 h-auto text-xs"
+                    asChild
+                  >
+                    <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
+                      <MessageCircle className="mr-1 h-3 w-3" />
+                      Contact
+                    </a>
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    className="border-tennis-green text-tennis-green hover:bg-tennis-green/10 py-1 px-3 h-auto text-xs"
+                    asChild
+                  >
+                    <Link to={`/instructor/${instructor.id}`}>
+                      More Info
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </div>
             
@@ -62,28 +84,6 @@ const InstructorCard = ({ instructor, timeSlot }: InstructorCardProps) => {
             <div className="mt-3">
               <p className="text-sm"><span className="font-medium">Teaches:</span> {instructor.levels.join(", ")}</p>
               <p className="text-sm"><span className="font-medium">Location:</span> {timeSlot.location}</p>
-            </div>
-            
-            {/* Action Buttons */}
-            <div className="mt-4 flex flex-col sm:flex-row gap-3">
-              <Button 
-                className="bg-tennis-green hover:bg-tennis-green/90"
-                asChild
-              >
-                <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
-                  <MessageCircle className="mr-2 h-4 w-4" />
-                  Contact
-                </a>
-              </Button>
-              <Button 
-                variant="outline"
-                className="border-tennis-green text-tennis-green hover:bg-tennis-green/10"
-                asChild
-              >
-                <Link to={`/instructor/${instructor.id}`}>
-                  More Info
-                </Link>
-              </Button>
             </div>
           </div>
         </div>

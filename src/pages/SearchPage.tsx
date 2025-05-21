@@ -7,6 +7,8 @@ import InstructorCard from "@/components/InstructorCard";
 import { Instructor, FilterOptions, TimeSlot } from "@/types/instructor";
 import { instructors } from "@/data/instructors";
 import { isSameDay } from "date-fns";
+import { Button } from "@/components/ui/button";
+import { ArrowDown, ArrowUp } from "lucide-react";
 
 const SearchPage = () => {
   const today = new Date();
@@ -25,6 +27,8 @@ const SearchPage = () => {
   const [filteredResults, setFilteredResults] = useState<{ instructor: Instructor, timeSlot: TimeSlot }[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [noResults, setNoResults] = useState<boolean>(false);
+  const [sortBy, setSortBy] = useState<"time" | "price">("time");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   
   // Apply filters to instructors and their availability
   useEffect(() => {
@@ -70,20 +74,32 @@ const SearchPage = () => {
         });
       });
       
-      // Sort results by time (earliest first)
-      results.sort((a, b) => {
-        const aTime = a.timeSlot.startTime;
-        const bTime = b.timeSlot.startTime;
-        return aTime.localeCompare(bTime);
-      });
+      // Sort results based on current sort settings
+      let sortedResults = [...results];
       
-      setFilteredResults(results);
-      setNoResults(results.length === 0);
+      if (sortBy === "time") {
+        sortedResults.sort((a, b) => {
+          const aTime = a.timeSlot.startTime;
+          const bTime = b.timeSlot.startTime;
+          return sortDirection === "asc" 
+            ? aTime.localeCompare(bTime)
+            : bTime.localeCompare(aTime);
+        });
+      } else if (sortBy === "price") {
+        sortedResults.sort((a, b) => {
+          return sortDirection === "asc"
+            ? a.instructor.fee - b.instructor.fee
+            : b.instructor.fee - a.instructor.fee;
+        });
+      }
+      
+      setFilteredResults(sortedResults);
+      setNoResults(sortedResults.length === 0);
       setIsLoading(false);
     }, 500);
     
     return () => clearTimeout(timer);
-  }, [filters]);
+  }, [filters, sortBy, sortDirection]);
   
   const handleFilterChange = (newFilters: FilterOptions) => {
     setFilters(newFilters);
@@ -91,6 +107,15 @@ const SearchPage = () => {
   
   const handleDateChange = (date: Date) => {
     setFilters({ ...filters, date });
+  };
+  
+  const toggleSort = (type: "time" | "price") => {
+    if (sortBy === type) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(type);
+      setSortDirection("asc");
+    }
   };
   
   return (
@@ -106,20 +131,22 @@ const SearchPage = () => {
           </p>
         </div>
         
-        {/* Filter Section */}
-        <FilterSection 
-          onFilterChange={handleFilterChange}
-          activeFilters={filters}
-        />
-        
-        {/* Date Navigation */}
-        <DateNavigation 
-          currentDate={filters.date}
-          onDateChange={handleDateChange}
-        />
+        {/* Filter Section - Fixed at the top */}
+        <div className="sticky top-16 z-40">
+          <FilterSection 
+            onFilterChange={handleFilterChange}
+            activeFilters={filters}
+          />
+          
+          {/* Date Navigation */}
+          <DateNavigation 
+            currentDate={filters.date}
+            onDateChange={handleDateChange}
+          />
+        </div>
         
         {/* Results Section */}
-        <div className="mb-6">
+        <div className="mb-6 mt-4">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">
               {isLoading 
@@ -127,6 +154,30 @@ const SearchPage = () => {
                 : `Available Instructors ${filteredResults.length > 0 ? `(${filteredResults.length})` : ''}`
               }
             </h2>
+            
+            {/* Sort Controls */}
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                className={`text-xs ${sortBy === "time" ? "bg-gray-100" : ""}`}
+                onClick={() => toggleSort("time")}
+              >
+                Time {sortBy === "time" && (
+                  sortDirection === "asc" ? <ArrowUp className="ml-1 h-3 w-3" /> : <ArrowDown className="ml-1 h-3 w-3" />
+                )}
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className={`text-xs ${sortBy === "price" ? "bg-gray-100" : ""}`}
+                onClick={() => toggleSort("price")}
+              >
+                Price {sortBy === "price" && (
+                  sortDirection === "asc" ? <ArrowUp className="ml-1 h-3 w-3" /> : <ArrowDown className="ml-1 h-3 w-3" />
+                )}
+              </Button>
+            </div>
           </div>
           
           {isLoading ? (

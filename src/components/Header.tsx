@@ -17,37 +17,10 @@ const Header = () => {
           <span className="text-lg font-bold text-tennis-green">TennisPro</span>
         </Link>
         
-        <div className="hidden md:flex items-center gap-6">
-          <Link to="/" className="hover:text-tennis-green transition-colors">Find Instructors</Link>
-          <Link to="/" className="hover:text-tennis-green transition-colors">How It Works</Link>
-          <Link to="/" className="hover:text-tennis-green transition-colors">For Coaches</Link>
-          <Button variant="outline" className="border-tennis-green text-tennis-green hover:bg-tennis-green hover:text-white">
-            Sign Up
-          </Button>
-        </div>
-        
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="md:hidden"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          <Menu className="h-6 w-6" />
+        <Button variant="outline" className="border-tennis-green text-tennis-green hover:bg-tennis-green hover:text-white">
+          Sign Up for Tennis Instructors
         </Button>
       </div>
-      
-      {mobileMenuOpen && (
-        <div className="md:hidden border-t border-gray-200 animate-fade-in">
-          <div className="container mx-auto px-4 py-2 space-y-2">
-            <Link to="/" className="block py-2 hover:text-tennis-green transition-colors">Find Instructors</Link>
-            <Link to="/" className="block py-2 hover:text-tennis-green transition-colors">How It Works</Link>
-            <Link to="/" className="block py-2 hover:text-tennis-green transition-colors">For Coaches</Link>
-            <Button className="w-full mt-2 btn-tennis-primary">
-              Sign Up
-            </Button>
-          </div>
-        </div>
-      )}
     </header>
   );
 };

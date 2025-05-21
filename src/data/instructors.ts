@@ -1,30 +1,38 @@
 
 import { Instructor } from "../types/instructor";
-import { addDays } from "date-fns";
+import { addDays, addMonths, format } from "date-fns";
 
-// Helper function to create availability slots
+// Helper function to create availability slots through June 2025
 const generateAvailability = (instructorId: string, baseDate: Date, locations: string[]) => {
   const availability = [];
   
-  // Generate slots for 7 days
-  for (let day = 0; day < 7; day++) {
-    const date = addDays(baseDate, day);
-    const dateStr = date.toISOString().split('T')[0];
+  // Generate slots for the next 14 months (through June 2025)
+  for (let month = 0; month < 14; month++) {
+    // Add 2-3 days per month
+    const currentMonth = addMonths(baseDate, month);
+    const daysInMonth = Math.floor(Math.random() * 2) + 2; // 2-3 days per month
     
-    // Generate random slots for each day
-    const slotsCount = Math.floor(Math.random() * 5) + 2; // 2-6 slots per day
-    for (let i = 0; i < slotsCount; i++) {
-      const startHour = Math.floor(Math.random() * 12) + 8; // 8am to 8pm
-      const endHour = startHour + 1; // 1 hour sessions
+    for (let dayOffset = 0; dayOffset < daysInMonth; dayOffset++) {
+      // Pick random days within the month
+      const dayInMonth = Math.floor(Math.random() * 28) + 1; // Random day 1-28 to avoid month boundary issues
+      const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), dayInMonth);
+      const dateStr = format(date, "yyyy-MM-dd");
       
-      availability.push({
-        id: `${instructorId}-${dateStr}-${startHour}`,
-        date: dateStr,
-        startTime: `${startHour}:00`,
-        endTime: `${endHour}:00`,
-        location: locations[Math.floor(Math.random() * locations.length)],
-        booked: Math.random() > 0.8 // 20% chance of being booked
-      });
+      // Generate random slots for each day
+      const slotsCount = Math.floor(Math.random() * 4) + 2; // 2-5 slots per day
+      for (let i = 0; i < slotsCount; i++) {
+        const startHour = Math.floor(Math.random() * 12) + 8; // 8am to 8pm
+        const endHour = startHour + 1; // 1 hour sessions
+        
+        availability.push({
+          id: `${instructorId}-${dateStr}-${startHour}`,
+          date: dateStr,
+          startTime: `${startHour}:00`,
+          endTime: `${endHour}:00`,
+          location: locations[Math.floor(Math.random() * locations.length)],
+          booked: Math.random() > 0.8 // 20% chance of being booked
+        });
+      }
     }
   }
   
@@ -49,7 +57,7 @@ export const instructors: Instructor[] = [
     image: "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952",
     location: ["Kallang", "Tampines"],
     fee: 70,
-    levels: ["Beginner", "Intermediate", "Kids (5-12)"],
+    levels: ["Beginner", "Intermediate"],
     providesOwnCourt: false,
     bio: "Former national player with 10+ years of coaching experience. Specializes in developing fundamentals and building confidence in new players.",
     phone: "91234567",
@@ -80,9 +88,9 @@ export const instructors: Instructor[] = [
     image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
     location: ["Bukit Timah", "Jurong"],
     fee: 90,
-    levels: ["Intermediate", "Advanced", "Professional"],
+    levels: ["Intermediate"],
     providesOwnCourt: true,
-    bio: "Professional player with ATP tour experience. Focused on advanced techniques, tournament preparation, and mental toughness.",
+    bio: "Professional player with 8 years of coaching experience. Focused on intermediate techniques, match preparation, and strategic gameplay.",
     phone: "92345678",
     rating: 4.9,
     reviews: [
@@ -111,9 +119,9 @@ export const instructors: Instructor[] = [
     image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
     location: ["Yio Chu Kang", "Serangoon"],
     fee: 60,
-    levels: ["Beginner", "Kids (5-12)", "Teenagers (13-19)"],
+    levels: ["Beginner"],
     providesOwnCourt: false,
-    bio: "Youth coach with specialty in introducing tennis to young players. Creates fun, engaging lessons that build skills while enjoying the game.",
+    bio: "Specialized in introducing tennis to beginners. Creates fun, engaging lessons that build skills while enjoying the game.",
     phone: "93456789",
     rating: 4.7,
     reviews: [
@@ -122,7 +130,7 @@ export const instructors: Instructor[] = [
         userId: "u5",
         userName: "Jennifer H.",
         rating: 5,
-        comment: "My 7-year-old was initially reluctant but now loves tennis thanks to Coach Raj.",
+        comment: "Raj is incredibly patient. Perfect for beginners like me.",
         date: "2024-04-20"
       },
       {
@@ -130,7 +138,7 @@ export const instructors: Instructor[] = [
         userId: "u6",
         userName: "Kevin T.",
         rating: 4,
-        comment: "Great with kids. Makes the lessons entertaining and educational.",
+        comment: "Great approach to teaching fundamentals. Highly recommended.",
         date: "2024-03-15"
       }
     ],
@@ -142,9 +150,9 @@ export const instructors: Instructor[] = [
     image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
     location: ["Marina Bay", "Kallang"],
     fee: 110,
-    levels: ["Advanced", "Professional"],
+    levels: ["Intermediate"],
     providesOwnCourt: true,
-    bio: "Former WTA player specialized in advanced coaching. Focus on technique refinement, tactical play, and competition strategies.",
+    bio: "Former national player specialized in intermediate coaching. Focus on technique refinement, tactical play, and competition strategies.",
     phone: "94567890",
     rating: 5.0,
     reviews: [
@@ -161,7 +169,7 @@ export const instructors: Instructor[] = [
         userId: "u8",
         userName: "Sophie W.",
         rating: 5,
-        comment: "If you're serious about improving your game at an advanced level, Lisa is the coach for you.",
+        comment: "Worth every penny. Lisa has transformed my game completely.",
         date: "2024-04-01"
       }
     ],
@@ -173,9 +181,9 @@ export const instructors: Instructor[] = [
     image: "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952",
     location: ["Woodlands", "Jurong", "Pasir Ris"],
     fee: 50,
-    levels: ["Beginner", "Intermediate", "Teenagers (13-19)"],
+    levels: ["Beginner", "Intermediate"],
     providesOwnCourt: false,
-    bio: "Community coach focused on making tennis accessible to everyone. Patient approach for adult beginners and casual players looking to improve.",
+    bio: "Community coach focused on making tennis accessible to everyone. Patient approach for beginners and developing intermediate players.",
     phone: "95678901",
     rating: 4.6,
     reviews: [
@@ -184,7 +192,7 @@ export const instructors: Instructor[] = [
         userId: "u9",
         userName: "Rachel K.",
         rating: 5,
-        comment: "Ahmad is incredibly patient. I started as a complete beginner at 40 and now enjoy playing regularly.",
+        comment: "Ahmad is incredibly patient. I started as a complete beginner and now enjoy playing regularly.",
         date: "2024-04-18"
       },
       {
@@ -197,5 +205,98 @@ export const instructors: Instructor[] = [
       }
     ],
     availability: generateAvailability("5", today, ["Woodlands", "Jurong", "Pasir Ris"])
+  },
+  {
+    id: "6",
+    name: "Sarah Lim",
+    image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
+    location: ["Tampines", "Pasir Ris"],
+    fee: 75,
+    levels: ["Beginner", "Intermediate"],
+    providesOwnCourt: true,
+    bio: "Tennis coach with 5 years of experience teaching players of all ages. Specializes in developing proper technique and building confidence.",
+    phone: "96789012",
+    rating: 4.7,
+    reviews: [
+      {
+        id: "r6-1",
+        userId: "u11",
+        userName: "Jason T.",
+        rating: 5,
+        comment: "Sarah is an excellent coach who makes learning tennis enjoyable. Highly recommend!",
+        date: "2024-05-10"
+      },
+      {
+        id: "r6-2",
+        userId: "u12",
+        userName: "Linda M.",
+        rating: 4.5,
+        comment: "My technique has improved significantly since I started lessons with Sarah.",
+        date: "2024-04-28"
+      }
+    ],
+    availability: generateAvailability("6", today, ["Tampines", "Pasir Ris"])
+  },
+  {
+    id: "7",
+    name: "Daniel Teo",
+    image: "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952",
+    location: ["Jurong", "Bukit Timah"],
+    fee: 85,
+    levels: ["Intermediate"],
+    providesOwnCourt: false,
+    bio: "Former collegiate player with a focus on developing intermediate players. Specializes in strategic gameplay and technique refinement.",
+    phone: "97890123",
+    rating: 4.8,
+    reviews: [
+      {
+        id: "r7-1",
+        userId: "u13",
+        userName: "Monica W.",
+        rating: 5,
+        comment: "Daniel has helped me take my game to the next level. His strategic insights are invaluable.",
+        date: "2024-05-05"
+      },
+      {
+        id: "r7-2",
+        userId: "u14",
+        userName: "Kenneth L.",
+        rating: 4.5,
+        comment: "Great coach for intermediate players looking to improve their game.",
+        date: "2024-04-20"
+      }
+    ],
+    availability: generateAvailability("7", today, ["Jurong", "Bukit Timah"])
+  },
+  {
+    id: "8",
+    name: "Priya Sharma",
+    image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
+    location: ["Serangoon", "Kallang"],
+    fee: 65,
+    levels: ["Beginner"],
+    providesOwnCourt: false,
+    bio: "Specialized in beginner-friendly coaching with a focus on building proper foundations. Makes tennis accessible and enjoyable for all.",
+    phone: "98901234",
+    rating: 4.6,
+    reviews: [
+      {
+        id: "r8-1",
+        userId: "u15",
+        userName: "Victor C.",
+        rating: 5,
+        comment: "Priya is incredibly patient and makes learning tennis so much fun. Perfect for beginners!",
+        date: "2024-05-12"
+      },
+      {
+        id: "r8-2",
+        userId: "u16",
+        userName: "Natasha R.",
+        rating: 4,
+        comment: "Great instructor for anyone just starting out with tennis.",
+        date: "2024-04-25"
+      }
+    ],
+    availability: generateAvailability("8", today, ["Serangoon", "Kallang"])
   }
 ];
