@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -86,11 +85,20 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
 
   return (
     <div>
-      <h2 className="text-base font-semibold mb-3">Find Your Tennis Instructor</h2>
-      
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-base font-semibold">Find Your Tennis Instructor</h2>
+        <div className="flex items-center gap-2">
+          <Label htmlFor="needsCourt" className="text-xs">Need Court</Label>
+          <Switch
+            id="needsCourt"
+            checked={filters.needsCourt}
+            onCheckedChange={(checked) => handleFilterChange("needsCourt", checked)}
+            className="h-4"
+          />
+        </div>
+      </div>
       <div className="grid grid-cols-5 gap-3">
-
-{/* Date Selection */}
+        {/* Date Selection */}
         <div className="space-y-1">
           <Label htmlFor="date" className="text-xs">Available Dates</Label>
           <div className="flex h-8 space-x-1">
@@ -102,7 +110,6 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -127,7 +134,6 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
                 />
               </PopoverContent>
             </Popover>
-            
             <Button
               variant="outline" 
               size="icon"
@@ -139,9 +145,21 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
           </div>
         </div>
 
-
-
-
+        {/* Time Range */}
+        <div className="space-y-1">
+          <Label htmlFor="timeRange" className="text-xs">
+            Time: {filters.timeRange[0]}:00 - {filters.timeRange[1]}:00
+          </Label>
+          <Slider
+            id="timeRange"
+            value={filters.timeRange}
+            min={7}
+            max={22}
+            step={1}
+            onValueChange={(value) => handleFilterChange("timeRange", value)}
+            className="py-2"
+          />
+        </div>
 
         {/* Location */}
         <div className="space-y-1">
@@ -245,32 +263,6 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
             max={200}
             step={10}
             onValueChange={(value) => handleFilterChange("budget", value[0])}
-            className="py-2"
-          />
-        </div>
-        
-        
-        {/* Need Court + Time Range */}
-        <div className="space-y-1">
-          <div className="flex justify-between text-xs">
-            <Label htmlFor="timeRange">Time: {filters.timeRange[0]}:00 - {filters.timeRange[1]}:00</Label>
-            <div className="flex items-center gap-2">
-              <Label htmlFor="needsCourt" className="text-xs">Need Court</Label>
-              <Switch
-                id="needsCourt"
-                checked={filters.needsCourt}
-                onCheckedChange={(checked) => handleFilterChange("needsCourt", checked)}
-                className="h-4"
-              />
-            </div>
-          </div>
-          <Slider
-            id="timeRange"
-            value={filters.timeRange}
-            min={7}
-            max={22}
-            step={1}
-            onValueChange={(value) => handleFilterChange("timeRange", value)}
             className="py-2"
           />
         </div>
