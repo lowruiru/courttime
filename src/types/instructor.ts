@@ -55,9 +55,5 @@ export const Locations = [
 
 export const Levels = [
   "Beginner",
-  "Intermediate",
-  "Advanced",
-  "Professional",
-  "Kids (5-12)",
-  "Teenagers (13-19)"
+  "Intermediate"
 ];

@@ -23,13 +23,15 @@ const InstructorCard = ({ instructor, timeSlot }: InstructorCardProps) => {
     <Card className="mb-4 overflow-hidden transition-shadow hover:shadow-md">
       <CardContent className="p-0">
         <div className="flex flex-col md:flex-row">
-          {/* Instructor Image (Small Version) */}
-          <div className="md:w-1/4 bg-muted">
-            <img 
-              src={instructor.image} 
-              alt={instructor.name} 
-              className="w-full h-40 md:h-full object-cover"
-            />
+          {/* Time Slot (Left Column) */}
+          <div className="md:w-1/5 bg-gray-50 p-4 flex flex-col justify-center items-center">
+            <Clock className="h-5 w-5 mb-1 text-tennis-green" />
+            <p className="text-lg font-bold text-tennis-green">{startTime}</p>
+            <p className="text-sm text-muted-foreground">to {endTime}</p>
+            <div className="mt-2 text-xs">
+              <Calendar className="h-4 w-4 inline mr-1" />
+              <span>{format(date, "EEE, MMM d")}</span>
+            </div>
           </div>
           
           {/* Instructor Details */}
@@ -60,14 +62,6 @@ const InstructorCard = ({ instructor, timeSlot }: InstructorCardProps) => {
             <div className="mt-3">
               <p className="text-sm"><span className="font-medium">Teaches:</span> {instructor.levels.join(", ")}</p>
               <p className="text-sm"><span className="font-medium">Location:</span> {timeSlot.location}</p>
-            </div>
-            
-            {/* Time Slot */}
-            <div className="mt-3 flex items-center gap-2 text-sm">
-              <Calendar className="h-4 w-4" />
-              <span>{format(date, "EEE, MMMM d, yyyy")}</span>
-              <Clock className="h-4 w-4 ml-2" />
-              <span>{startTime} - {endTime}</span>
             </div>
             
             {/* Action Buttons */}

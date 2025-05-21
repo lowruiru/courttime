@@ -159,6 +159,18 @@ const SearchPage = () => {
             </div>
           )}
         </div>
+        
+        {/* Disclaimer Footer */}
+        <div className="border-t border-gray-200 mt-12 pt-6 text-sm text-gray-500">
+          <h3 className="font-semibold mb-2">Disclaimer:</h3>
+          <p className="mb-4">
+            This website is created for learning purposes only. The information provided here should not be 
+            considered professional advice. Please note that we make no guarantees regarding the accuracy, 
+            completeness, or reliability of the contents of this website. Any actions you take based on the 
+            contents of this website are at your own risk. We are not liable for any losses or damages 
+            incurred from the use of this website.
+          </p>
+        </div>
       </div>
     </div>
   );
