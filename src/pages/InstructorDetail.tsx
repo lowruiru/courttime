@@ -228,6 +228,20 @@ const InstructorDetail = () => {
                     <p>No reviews yet.</p>
                   )}
                 </div>
+                 {/* Google Sign In Button for Feedback */}
+                <div className="mt-8 text-center">
+                  <button
+                    className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 transition text-sm w-full"
+                    onClick={() => window.location.href = "https://accounts.google.com/signin"}
+                  >
+                    <img
+                      src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                      alt="Google"
+                      className="h-5 w-5"
+                    />
+                    <span>Sign in with Google to submit feedback</span>
+                  </button>
+                </div>
               </CardContent>
             </Card>
           </div>
