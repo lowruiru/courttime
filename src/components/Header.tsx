@@ -19,7 +19,7 @@ const Header = () => {
     size="sm"
     className="border-tennis-green text-tennis-green hover:bg-tennis-green hover:text-white text-xs h-7"
   >
-    Sign Up for Tennis Instructors
+    Register as a Tennis Instructor
   </Button>
 </Link>
       </div>
