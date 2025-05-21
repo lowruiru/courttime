@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import FilterSection from "@/components/FilterSection";
-import DateNavigation from "@/components/DateNavigation";
 import InstructorCard from "@/components/InstructorCard";
 import { Instructor, FilterOptions, TimeSlot } from "@/types/instructor";
 import { instructors } from "@/data/instructors";
@@ -15,7 +14,7 @@ const SearchPage = () => {
   today.setHours(0, 0, 0, 0);
   
   const defaultFilters: FilterOptions = {
-    location: "",
+    location: [],
     budget: 200,
     level: "",
     needsCourt: false,
@@ -44,7 +43,10 @@ const SearchPage = () => {
         if (instructor.fee > filters.budget) return;
         
         // Filter by location if specified
-        if (filters.location && filters.location !== "all_locations" && !instructor.location.includes(filters.location)) return;
+        if (filters.location.length > 0) {
+          const hasMatch = instructor.location.some(loc => filters.location.includes(loc));
+          if (!hasMatch) return;
+        }
         
         // Filter by level if specified
         if (filters.level && filters.level !== "all_levels" && !instructor.levels.includes(filters.level)) return;
@@ -105,10 +107,6 @@ const SearchPage = () => {
     setFilters(newFilters);
   };
   
-  const handleDateChange = (date: Date) => {
-    setFilters({ ...filters, date });
-  };
-  
   const toggleSort = (type: "time" | "price") => {
     if (sortBy === type) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -124,33 +122,25 @@ const SearchPage = () => {
       
       <div className="container mx-auto px-4">
         {/* Compact Hero Section */}
-        <div className="mb-4 pt-4 text-center">
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">Find Tennis Instructors in Singapore</h1>
-          <p className="text-sm text-muted-foreground md:w-2/3 mx-auto">
+        <div className="mb-2 pt-2 text-center">
+          <h1 className="text-xl md:text-2xl font-bold mb-1">Find Tennis Instructors in Singapore</h1>
+          <p className="text-xs text-muted-foreground md:w-2/3 mx-auto">
             Book lessons with experienced tennis instructors at your preferred location, time, and budget.
           </p>
         </div>
         
         {/* Fixed Filter and Date Navigation - Combined and Compact */}
-        <div className="sticky top-[48px] z-40 bg-gray-50 pt-2 pb-4">
-          <div className="bg-white rounded-lg shadow-md p-4 mb-0">
+        <div className="sticky top-[48px] z-40 bg-gray-50 pt-1 pb-2">
+          <div className="bg-white rounded-lg shadow-md p-3 mb-0">
             <FilterSection 
               onFilterChange={handleFilterChange}
               activeFilters={filters}
             />
-            
-            {/* Date Navigation right after filters */}
-            <div className="mt-3 border-t pt-3">
-              <DateNavigation 
-                currentDate={filters.date}
-                onDateChange={handleDateChange}
-              />
-            </div>
           </div>
           
           {/* Sort Controls */}
-          <div className="bg-white rounded-b-lg shadow-md px-4 py-3 mb-4 border-t flex justify-between items-center">
-            <h2 className="text-base font-semibold">
+          <div className="bg-white rounded-b-lg shadow-md px-3 py-2 mb-3 border-t flex justify-between items-center">
+            <h2 className="text-sm font-semibold">
               {isLoading 
                 ? "Searching for instructors..." 
                 : `Available Instructors ${filteredResults.length > 0 ? `(${filteredResults.length})` : ''}`
@@ -161,7 +151,7 @@ const SearchPage = () => {
               <Button 
                 variant="outline" 
                 size="sm"
-                className={`text-xs ${sortBy === "time" ? "bg-gray-100" : ""}`}
+                className={`text-xs h-7 ${sortBy === "time" ? "bg-gray-100" : ""}`}
                 onClick={() => toggleSort("time")}
               >
                 Time {sortBy === "time" && (
@@ -171,7 +161,7 @@ const SearchPage = () => {
               <Button 
                 variant="outline" 
                 size="sm"
-                className={`text-xs ${sortBy === "price" ? "bg-gray-100" : ""}`}
+                className={`text-xs h-7 ${sortBy === "price" ? "bg-gray-100" : ""}`}
                 onClick={() => toggleSort("price")}
               >
                 Price {sortBy === "price" && (
@@ -183,21 +173,21 @@ const SearchPage = () => {
         </div>
         
         {/* Results Section */}
-        <div className="mb-6 pt-2">
+        <div className="mb-6 pt-1">
           {isLoading ? (
             // Loading state 
-            <div className="flex justify-center py-8">
-              <div className="animate-pulse space-y-4 w-full">
+            <div className="flex justify-center py-4">
+              <div className="animate-pulse space-y-3 w-full">
                 {[...Array(3)].map((_, index) => (
-                  <div key={index} className="bg-white rounded-lg shadow-sm h-48" />
+                  <div key={index} className="bg-white rounded-lg shadow-sm h-36" />
                 ))}
               </div>
             </div>
           ) : noResults ? (
             // No results state
-            <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+            <div className="bg-white rounded-lg shadow-sm p-6 text-center">
               <h3 className="text-lg font-medium mb-2">No instructors found</h3>
-              <p className="text-muted-foreground mb-4">
+              <p className="text-muted-foreground mb-3">
                 Try adjusting your filters to see more results.
               </p>
             </div>
@@ -216,9 +206,9 @@ const SearchPage = () => {
         </div>
         
         {/* Disclaimer Footer */}
-        <div className="border-t border-gray-200 mt-12 pt-6 text-sm text-gray-500">
+        <div className="border-t border-gray-200 mt-8 pt-4 text-sm text-gray-500">
           <h3 className="font-semibold mb-2">Disclaimer:</h3>
-          <p className="mb-4">
+          <p className="mb-4 text-xs">
             This website is created for learning purposes only. The information provided here should not be 
             considered professional advice. Please note that we make no guarantees regarding the accuracy, 
             completeness, or reliability of the contents of this website. Any actions you take based on the 

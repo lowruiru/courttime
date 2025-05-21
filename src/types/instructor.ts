@@ -33,7 +33,7 @@ export interface TimeSlot {
 }
 
 export interface FilterOptions {
-  location: string;
+  location: string[];
   budget: number;
   level: string;
   needsCourt: boolean;
@@ -41,17 +41,17 @@ export interface FilterOptions {
   timeRange: [number, number]; // 24h format, e.g. [8, 21] for 8am to 9pm
 }
 
-export const Locations = [
-  "Kallang",
-  "Jurong",
-  "Tampines",
-  "Bukit Timah",
-  "Yio Chu Kang",
-  "Serangoon",
-  "Marina Bay",
-  "Woodlands",
-  "Pasir Ris"
-];
+export const NeighborhoodsByRegion = {
+  "North": ["Ang Mo Kio", "Woodlands", "Sembawang", "Yishun"],
+  "North-east": ["Hougang", "Punggol", "Sengkang", "Serangoon"],
+  "East": ["Bedok", "Geylang", "Marine Parade", "Pasir Ris", "Tampines"],
+  "Central": ["Central Area", "Bishan", "Toa Payoh", "Kallang/Whampoa"],
+  "South": ["Bukit Merah", "Queenstown", "Bukit Timah"],
+  "West": ["Bukit Batok", "Bukit Panjang", "Bukit Timah", "Choa Chu Kang", "Clementi", "Jurong East", "Jurong West", "Tengah"]
+};
+
+// Flatten neighborhoods for easier access
+export const AllNeighborhoods = Object.values(NeighborhoodsByRegion).flat();
 
 export const Levels = [
   "Beginner",
