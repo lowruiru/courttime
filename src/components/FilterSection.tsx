@@ -84,22 +84,25 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
     }
   };
 
-return (
+  return (
     <div>
       <h2 className="text-base font-semibold mb-3">Find Your Tennis Instructor</h2>
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        {/* Date Selection */}
+      
+      <div className="grid grid-cols-5 gap-3">
+
+{/* Date Selection */}
         <div className="space-y-1">
           <Label htmlFor="date" className="text-xs">Available Dates</Label>
           <div className="flex h-8 space-x-1">
             <Button
-              variant="outline"
-              size="icon"
+              variant="outline" 
+              size="icon" 
               className="h-8 w-8"
               onClick={goToPreviousDay}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
+            
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -124,8 +127,9 @@ return (
                 />
               </PopoverContent>
             </Popover>
+            
             <Button
-              variant="outline"
+              variant="outline" 
               size="icon"
               className="h-8 w-8"
               onClick={goToNextDay}
@@ -134,6 +138,10 @@ return (
             </Button>
           </div>
         </div>
+
+
+
+
 
         {/* Location */}
         <div className="space-y-1">
@@ -189,8 +197,8 @@ return (
               {filters.location.slice(0, 2).map((location) => (
                 <Badge key={location} variant="outline" className="text-[10px] h-5 px-1">
                   {location}
-                  <X
-                    className="h-3 w-3 ml-1 cursor-pointer"
+                  <X 
+                    className="h-3 w-3 ml-1 cursor-pointer" 
                     onClick={() => removeLocation(location)}
                   />
                 </Badge>
@@ -203,7 +211,7 @@ return (
             </div>
           )}
         </div>
-
+        
         {/* Level */}
         <div className="space-y-1">
           <Label htmlFor="level" className="text-xs">Level</Label>
@@ -227,7 +235,9 @@ return (
 
         {/* Budget */}
         <div className="space-y-1">
-          <Label htmlFor="budget" className="text-xs">Budget: S${filters.budget}</Label>
+          <div className="flex justify-between">
+            <Label htmlFor="budget" className="text-xs">Budget: S${filters.budget}</Label>
+          </div>
           <Slider
             id="budget"
             value={[filters.budget]}
@@ -238,12 +248,22 @@ return (
             className="py-2"
           />
         </div>
-
-        {/* Time Range & Need Court */}
+        
+        
+        {/* Need Court + Time Range */}
         <div className="space-y-1">
-          <Label htmlFor="timeRange" className="text-xs">
-            Time: {filters.timeRange[0]}:00 - {filters.timeRange[1]}:00
-          </Label>
+          <div className="flex justify-between text-xs">
+            <Label htmlFor="timeRange">Time: {filters.timeRange[0]}:00 - {filters.timeRange[1]}:00</Label>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="needsCourt" className="text-xs">Need Court</Label>
+              <Switch
+                id="needsCourt"
+                checked={filters.needsCourt}
+                onCheckedChange={(checked) => handleFilterChange("needsCourt", checked)}
+                className="h-4"
+              />
+            </div>
+          </div>
           <Slider
             id="timeRange"
             value={filters.timeRange}
@@ -253,18 +273,9 @@ return (
             onValueChange={(value) => handleFilterChange("timeRange", value)}
             className="py-2"
           />
-          <div className="flex items-center gap-2 mt-2">
-            <Label htmlFor="needsCourt" className="text-xs">Need Court</Label>
-            <Switch
-              id="needsCourt"
-              checked={filters.needsCourt}
-              onCheckedChange={(checked) => handleFilterChange("needsCourt", checked)}
-              className="h-4"
-            />
-          </div>
         </div>
       </div>
-
+      
       {/* Filter Action Buttons */}
       <div className="flex justify-end gap-3 mt-3">
         <Button variant="outline" size="sm" onClick={resetFilters} className="h-7 text-xs">Reset</Button>
