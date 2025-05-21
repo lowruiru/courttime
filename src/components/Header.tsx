@@ -13,14 +13,15 @@ const Header = () => {
           <span className="text-sm font-bold text-tennis-green">Court Time</span>
         </Link>
         
-<Button
-  variant="outline"
-  size="sm"
-  className="border-tennis-green text-tennis-green hover:bg-tennis-green hover:text-white text-xs h-7"
-  onClick={() => window.location.href = 'instructor-signup.html'}
->
-  Sign Up for Tennis Instructors
-</Button>
+<Link to="/instructor-signup">
+  <Button
+    variant="outline"
+    size="sm"
+    className="border-tennis-green text-tennis-green hover:bg-tennis-green hover:text-white text-xs h-7"
+  >
+    Sign Up for Tennis Instructors
+  </Button>
+</Link>
       </div>
     </header>
   );
