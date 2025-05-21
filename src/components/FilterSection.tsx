@@ -89,6 +89,60 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
       <h2 className="text-base font-semibold mb-3">Find Your Tennis Instructor</h2>
       
       <div className="grid grid-cols-5 gap-3">
+
+{/* Date Selection */}
+        <div className="space-y-1">
+          <Label htmlFor="date" className="text-xs">Available Dates</Label>
+          <div className="flex h-8 space-x-1">
+            <Button
+              variant="outline" 
+              size="icon" 
+              className="h-8 w-8"
+              onClick={goToPreviousDay}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  id="date"
+                  variant="outline"
+                  className={cn(
+                    "flex-1 justify-start text-left font-normal h-8 text-xs",
+                    !filters.date && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-3 w-3" />
+                  {filters.date ? format(filters.date, "EEE, MMM d") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={filters.date}
+                  onSelect={(date) => handleFilterChange("date", date)}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
+            
+            <Button
+              variant="outline" 
+              size="icon"
+              className="h-8 w-8"
+              onClick={goToNextDay}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
+
+
+
+
         {/* Location */}
         <div className="space-y-1">
           <Label htmlFor="location" className="text-xs">Location</Label>
@@ -195,55 +249,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
           />
         </div>
         
-        {/* Date Selection */}
-        <div className="space-y-1">
-          <Label htmlFor="date" className="text-xs">Available Dates</Label>
-          <div className="flex h-8 space-x-1">
-            <Button
-              variant="outline" 
-              size="icon" 
-              className="h-8 w-8"
-              onClick={goToPreviousDay}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  id="date"
-                  variant="outline"
-                  className={cn(
-                    "flex-1 justify-start text-left font-normal h-8 text-xs",
-                    !filters.date && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-3 w-3" />
-                  {filters.date ? format(filters.date, "EEE, MMM d") : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={filters.date}
-                  onSelect={(date) => handleFilterChange("date", date)}
-                  initialFocus
-                  className={cn("p-3 pointer-events-auto")}
-                />
-              </PopoverContent>
-            </Popover>
-            
-            <Button
-              variant="outline" 
-              size="icon"
-              className="h-8 w-8"
-              onClick={goToNextDay}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-
+        
         {/* Need Court + Time Range */}
         <div className="space-y-1">
           <div className="flex justify-between text-xs">
