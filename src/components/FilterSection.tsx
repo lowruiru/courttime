@@ -139,9 +139,19 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
           </div>
         </div>
 
-
-
-
+{/* Need Court + Time Range */}
+        <div className="space-y-1">
+          <div className="flex justify-between text-xs">
+            <Label htmlFor="timeRange">Time: {filters.timeRange[0]}:00 - {filters.timeRange[1]}:00</Label>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="needsCourt" className="text-xs">Need Court</Label>
+              <Switch
+                id="needsCourt"
+                checked={filters.needsCourt}
+                onCheckedChange={(checked) => handleFilterChange("needsCourt", checked)}
+                className="h-4"
+              />
+            </div>
 
         {/* Location */}
         <div className="space-y-1">
@@ -250,19 +260,6 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
         </div>
         
         
-        {/* Need Court + Time Range */}
-        <div className="space-y-1">
-          <div className="flex justify-between text-xs">
-            <Label htmlFor="timeRange">Time: {filters.timeRange[0]}:00 - {filters.timeRange[1]}:00</Label>
-            <div className="flex items-center gap-2">
-              <Label htmlFor="needsCourt" className="text-xs">Need Court</Label>
-              <Switch
-                id="needsCourt"
-                checked={filters.needsCourt}
-                onCheckedChange={(checked) => handleFilterChange("needsCourt", checked)}
-                className="h-4"
-              />
-            </div>
           </div>
           <Slider
             id="timeRange"
