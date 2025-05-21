@@ -10,7 +10,7 @@ const Header = () => {
           <div className="h-6 w-6 flex items-center justify-center rounded-full bg-tennis-yellow">
             <span className="text-black font-bold text-xs">T</span>
           </div>
-          <span className="text-sm font-bold text-tennis-green">TennisPro</span>
+          <span className="text-sm font-bold text-tennis-green">Court Time</span>
         </Link>
         
         <Button variant="outline" size="sm" className="border-tennis-green text-tennis-green hover:bg-tennis-green hover:text-white text-xs h-7">
