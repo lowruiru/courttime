@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -84,6 +83,13 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
     }
   };
 
+  // Auto-apply filters when date changes
+  const handleDateChange = (date: Date | undefined) => {
+    const newFilters = { ...filters, date };
+    setFilters(newFilters);
+    onFilterChange(newFilters);
+  };
+
   return (
     <div>
       <h2 className="text-base font-semibold mb-3">Find Your Tennis Instructor</h2>
@@ -121,7 +127,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
                 <Calendar
                   mode="single"
                   selected={filters.date}
-                  onSelect={(date) => handleFilterChange("date", date)}
+                  onSelect={handleDateChange}
                   initialFocus
                   className={cn("p-3 pointer-events-auto")}
                 />
