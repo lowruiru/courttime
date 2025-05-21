@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 
 const InstructorSignup: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -40,26 +39,10 @@ const InstructorSignup: React.FC = () => {
           >
             Sign Up
           </button>
-        <div className="mt-4 w-full">
-            <Link
-              to="/"
-              className="block text-center px-4 py-2 border border-tennis-green text-tennis-green rounded hover:bg-tennis-green hover:text-white transition"
-            >
-              Back to Homepage
-            </Link>
-          </div>
         </form>
       ) : (
         <div className="text-tennis-green text-center mt-6">
           Thank you for signing up! We will contact you soon.
-          <div className="mt-6">
-            <Link
-              to="/"
-              className="inline-block px-4 py-2 border border-tennis-green text-tennis-green rounded hover:bg-tennis-green hover:text-white transition"
-            >
-              Back to Homepage
-            </Link>
-          </div>
         </div>
       )}
     </div>
