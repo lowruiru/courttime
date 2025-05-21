@@ -122,40 +122,41 @@ const SearchPage = () => {
     <div className="min-h-screen bg-gray-50">
       <Header />
       
-      <div className="container mx-auto px-4 py-6 md:py-10">
-        {/* Hero Section */}
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-3">Find Tennis Instructors in Singapore</h1>
-          <p className="text-muted-foreground md:w-2/3 mx-auto">
+      <div className="container mx-auto px-4">
+        {/* Compact Hero Section */}
+        <div className="mb-4 pt-4 text-center">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Find Tennis Instructors in Singapore</h1>
+          <p className="text-sm text-muted-foreground md:w-2/3 mx-auto">
             Book lessons with experienced tennis instructors at your preferred location, time, and budget.
           </p>
         </div>
         
-        {/* Filter Section - Fixed at the top */}
-        <div className="sticky top-16 z-40">
-          <FilterSection 
-            onFilterChange={handleFilterChange}
-            activeFilters={filters}
-          />
+        {/* Fixed Filter and Date Navigation - Combined and Compact */}
+        <div className="sticky top-[48px] z-40 bg-gray-50 pt-2 pb-4">
+          <div className="bg-white rounded-lg shadow-md p-4 mb-0">
+            <FilterSection 
+              onFilterChange={handleFilterChange}
+              activeFilters={filters}
+            />
+            
+            {/* Date Navigation right after filters */}
+            <div className="mt-3 border-t pt-3">
+              <DateNavigation 
+                currentDate={filters.date}
+                onDateChange={handleDateChange}
+              />
+            </div>
+          </div>
           
-          {/* Date Navigation */}
-          <DateNavigation 
-            currentDate={filters.date}
-            onDateChange={handleDateChange}
-          />
-        </div>
-        
-        {/* Results Section */}
-        <div className="mb-6 mt-4">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">
+          {/* Sort Controls */}
+          <div className="bg-white rounded-b-lg shadow-md px-4 py-3 mb-4 border-t flex justify-between items-center">
+            <h2 className="text-base font-semibold">
               {isLoading 
                 ? "Searching for instructors..." 
                 : `Available Instructors ${filteredResults.length > 0 ? `(${filteredResults.length})` : ''}`
               }
             </h2>
             
-            {/* Sort Controls */}
             <div className="flex gap-2">
               <Button 
                 variant="outline" 
@@ -179,10 +180,13 @@ const SearchPage = () => {
               </Button>
             </div>
           </div>
-          
+        </div>
+        
+        {/* Results Section */}
+        <div className="mb-6 pt-2">
           {isLoading ? (
             // Loading state 
-            <div className="flex justify-center py-12">
+            <div className="flex justify-center py-8">
               <div className="animate-pulse space-y-4 w-full">
                 {[...Array(3)].map((_, index) => (
                   <div key={index} className="bg-white rounded-lg shadow-sm h-48" />

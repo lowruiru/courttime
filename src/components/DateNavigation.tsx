@@ -43,39 +43,41 @@ const DateNavigation = ({ currentDate, onDateChange }: DateNavigationProps) => {
   };
   
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="font-medium">Available Dates</h3>
-        <div className="flex gap-2">
+    <div>
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="text-xs font-medium">Available Dates</h3>
+        <div className="flex gap-1">
           <Button 
             variant="outline" 
             size="icon" 
+            className="h-6 w-6"
             onClick={goToPreviousWeek}
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-3 w-3" />
           </Button>
           <Button 
             variant="outline" 
             size="icon"
+            className="h-6 w-6"
             onClick={goToNextWeek}
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-3 w-3" />
           </Button>
         </div>
       </div>
       
-      <div className="grid grid-cols-7 gap-2">
+      <div className="grid grid-cols-7 gap-1">
         {dates.map((date, index) => (
           <Button
             key={index}
             variant={isCurrentDate(date) ? "default" : "outline"}
-            className={`flex flex-col h-auto py-2 ${
+            className={`flex flex-col h-auto py-1 px-1 ${
               isCurrentDate(date) ? "bg-tennis-green hover:bg-tennis-green/90" : ""
             }`}
             onClick={() => onDateChange(date)}
           >
-            <span className="text-xs font-normal">{format(date, "EEE")}</span>
-            <span className="text-lg">{format(date, "d")}</span>
+            <span className="text-[10px] font-normal">{format(date, "EEE")}</span>
+            <span className="text-sm">{format(date, "d")}</span>
           </Button>
         ))}
       </div>
