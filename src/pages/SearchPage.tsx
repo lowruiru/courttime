@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import FilterSection from "@/components/FilterSection";
@@ -18,6 +17,8 @@ import {
   PaginationPrevious 
 } from "@/components/ui/pagination";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 const RESULTS_PER_PAGE = 5;
 
@@ -225,6 +226,10 @@ const SearchPage = () => {
     });
   };
   
+  const handleInstructorSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleFilterChange({ ...filters, instructorName: e.target.value });
+  };
+  
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -243,12 +248,23 @@ const SearchPage = () => {
           {/* Sort Controls with Toggles */}
           <div className="bg-white rounded-lg shadow-md px-3 py-2 mb-0 flex justify-between items-center">
             <div className="flex items-center gap-3">
-              <h2 className={`text-sm font-semibold whitespace-nowrap ${isMobile ? 'hidden' : 'block'}`}>
+              <h2 className={`text-sm font-semibold whitespace-nowrap`}>
                 {isLoading 
                   ? "Searching for instructors..." 
                   : "Available Instructors"
                 }
               </h2>
+              
+              {/* Search bar moved back next to Available Instructors */}
+              <div className="relative">
+                <Input
+                  placeholder="Search instructor..."
+                  value={filters.instructorName || ""}
+                  onChange={handleInstructorSearch}
+                  className="h-8 text-xs pl-8 w-[200px]"
+                />
+                <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
+              </div>
             </div>
             
             <div className="flex gap-2 items-center">

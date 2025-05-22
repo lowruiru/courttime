@@ -291,20 +291,15 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
           />
         </div>
         
-        {/* Search Bar + Action Buttons - Moved to the bottom and made the same size */}
-        <div className={`flex gap-2 ${isMobile ? 'w-full mt-1' : 'col-span-2'}`}>
-          <div className="relative flex-1">
-            <Input
-              placeholder="Search instructor..."
-              value={filters.instructorName || ""}
-              onChange={(e) => handleFilterChange("instructorName", e.target.value)}
-              className="h-8 text-xs pl-8"
-            />
-            <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
-          </div>
-        </div>
-        
+        {/* Action Buttons with Search Button before Reset Button */}
         <div className={`flex gap-2 ${isMobile ? 'w-full' : 'col-span-2'}`}>
+          <Button 
+            size="sm" 
+            className="bg-tennis-green hover:bg-tennis-green/90 h-8 text-xs flex-1" 
+            onClick={applyFilters}
+          >
+            Search
+          </Button>
           <Button 
             variant="outline" 
             size="sm" 
@@ -312,13 +307,6 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
             className="h-8 text-xs flex-1"
           >
             Reset
-          </Button>
-          <Button 
-            size="sm" 
-            className="bg-tennis-green hover:bg-tennis-green/90 h-8 text-xs flex-1" 
-            onClick={applyFilters}
-          >
-            Search
           </Button>
         </div>
       </div>
