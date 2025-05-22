@@ -2,19 +2,20 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Instructor, TimeSlot } from "@/types/instructor";
-import { Calendar, Clock, MessageCircle } from "lucide-react";
+import { Calendar, Clock, MessageCircle, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format, parse } from "date-fns";
 
 interface InstructorCardProps {
   instructor: Instructor;
   timeSlot: TimeSlot;
+  classSize?: number;
 }
 
-const InstructorCard = ({ instructor, timeSlot }: InstructorCardProps) => {
+const InstructorCard = ({ instructor, timeSlot, classSize = 1 }: InstructorCardProps) => {
   const date = parse(timeSlot.date, "yyyy-MM-dd", new Date());
   const formattedDate = format(date, "EEE, MMM d, yyyy");
-  const whatsappMessage = `Hi ${instructor.name}, I'm interested in booking a tennis lesson with you on ${formattedDate} at ${timeSlot.startTime}.`;
+  const whatsappMessage = `Hi ${instructor.name}, I'm interested in booking a tennis lesson with you on ${formattedDate} at ${timeSlot.startTime} for ${classSize} ${classSize > 1 ? 'people' : 'person'}.`;
   const whatsappLink = `https://wa.me/${instructor.phone}?text=${encodeURIComponent(whatsappMessage)}`;
   
   return (
@@ -82,6 +83,13 @@ const InstructorCard = ({ instructor, timeSlot }: InstructorCardProps) => {
             
             {/* Levels and Location */}
             <div className="mt-3">
+              {/* Class Size */}
+              <p className="text-sm mb-1">
+                <span className="font-medium">Class size:</span>{" "}
+                <span className="inline-flex items-center">
+                  <Users className="h-3 w-3 mr-1" />{classSize} {classSize > 1 ? "pax" : "pax"}
+                </span>
+              </p>
               <p className="text-sm"><span className="font-medium">Teaches:</span> {instructor.levels.join(", ")}</p>
               <p className="text-sm"><span className="font-medium">Location:</span> {timeSlot.location}</p>
             </div>

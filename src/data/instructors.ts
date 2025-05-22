@@ -1,3 +1,4 @@
+
 import { Instructor, formatTimeToHHMM } from "../types/instructor";
 import { addDays, addMonths, format } from "date-fns";
 
@@ -125,7 +126,7 @@ let instructorsData: Instructor[] = [
   {
     id: "1",
     name: "James Wong",
-    image: "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952",
+    image: "https://images.unsplash.com/photo-1599171041648-944a0b9be55f?q=80&w=1480&auto=format&fit=crop",
     location: ["Kallang", "Tampines"],
     fee: 70,
     levels: ["Beginner", "Intermediate"],
@@ -133,6 +134,7 @@ let instructorsData: Instructor[] = [
     bio: "Former national player with 10+ years of coaching experience. Specializes in developing fundamentals and building confidence in new players.",
     phone: "91234567",
     rating: 4.8,
+    classSizes: [1, 2],
     reviews: [
       {
         id: "r1-1",
@@ -156,7 +158,7 @@ let instructorsData: Instructor[] = [
   {
     id: "2",
     name: "Michelle Tan",
-    image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
+    image: "https://images.unsplash.com/photo-1588453862009-502cd5df3d30?q=80&w=1480&auto=format&fit=crop",
     location: ["Bukit Timah", "Jurong"],
     fee: 90,
     levels: ["Intermediate"],
@@ -164,6 +166,7 @@ let instructorsData: Instructor[] = [
     bio: "Professional player with 8 years of coaching experience. Focused on intermediate techniques, match preparation, and strategic gameplay.",
     phone: "92345678",
     rating: 4.9,
+    classSizes: [1],
     reviews: [
       {
         id: "r2-1",
@@ -187,7 +190,7 @@ let instructorsData: Instructor[] = [
   {
     id: "3",
     name: "Raj Kumar",
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
+    image: "https://images.unsplash.com/photo-1622279457486-28f309bee101?q=80&w=1480&auto=format&fit=crop",
     location: ["Yio Chu Kang", "Serangoon"],
     fee: 60,
     levels: ["Beginner"],
@@ -195,6 +198,7 @@ let instructorsData: Instructor[] = [
     bio: "Specialized in introducing tennis to beginners. Creates fun, engaging lessons that build skills while enjoying the game.",
     phone: "93456789",
     rating: 4.7,
+    classSizes: [1, 2],
     reviews: [
       {
         id: "r3-1",
@@ -218,7 +222,7 @@ let instructorsData: Instructor[] = [
   {
     id: "4",
     name: "Lisa Chen",
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
+    image: "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c1?q=80&w=1480&auto=format&fit=crop",
     location: ["Marina Bay", "Kallang"],
     fee: 110,
     levels: ["Intermediate"],
@@ -226,6 +230,7 @@ let instructorsData: Instructor[] = [
     bio: "Former national player specialized in intermediate coaching. Focus on technique refinement, tactical play, and competition strategies.",
     phone: "94567890",
     rating: 5.0,
+    classSizes: [1, 2],
     reviews: [
       {
         id: "r4-1",
@@ -249,7 +254,7 @@ let instructorsData: Instructor[] = [
   {
     id: "5",
     name: "Ahmad Ibrahim",
-    image: "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952",
+    image: "https://images.unsplash.com/photo-1599152771241-3dd4e9e0a49c?q=80&w=1480&auto=format&fit=crop",
     location: ["Woodlands", "Jurong", "Pasir Ris"],
     fee: 50,
     levels: ["Beginner", "Intermediate"],
@@ -257,6 +262,7 @@ let instructorsData: Instructor[] = [
     bio: "Community coach focused on making tennis accessible to everyone. Patient approach for beginners and developing intermediate players.",
     phone: "95678901",
     rating: 4.6,
+    classSizes: [1, 2],
     reviews: [
       {
         id: "r5-1",
@@ -280,7 +286,7 @@ let instructorsData: Instructor[] = [
   {
     id: "6",
     name: "Sarah Lim",
-    image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
+    image: "https://images.unsplash.com/photo-1614743758466-e569f4791116?q=80&w=1480&auto=format&fit=crop",
     location: ["Tampines", "Pasir Ris"],
     fee: 75,
     levels: ["Beginner", "Intermediate"],
@@ -288,6 +294,7 @@ let instructorsData: Instructor[] = [
     bio: "Tennis coach with 5 years of experience teaching players of all ages. Specializes in developing proper technique and building confidence.",
     phone: "96789012",
     rating: 4.7,
+    classSizes: [1],
     reviews: [
       {
         id: "r6-1",
@@ -311,7 +318,7 @@ let instructorsData: Instructor[] = [
   {
     id: "7",
     name: "Daniel Teo",
-    image: "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952",
+    image: "https://images.unsplash.com/flagged/photo-1576972405668-2d020a01cbfa?q=80&w=1374&auto=format&fit=crop",
     location: ["Jurong", "Bukit Timah"],
     fee: 85,
     levels: ["Intermediate"],
@@ -319,6 +326,7 @@ let instructorsData: Instructor[] = [
     bio: "Former collegiate player with a focus on developing intermediate players. Specializes in strategic gameplay and technique refinement.",
     phone: "97890123",
     rating: 4.8,
+    classSizes: [1, 2],
     reviews: [
       {
         id: "r7-1",
@@ -342,7 +350,7 @@ let instructorsData: Instructor[] = [
   {
     id: "8",
     name: "Priya Sharma",
-    image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
+    image: "https://images.unsplash.com/photo-1560012057-4372e14c5085?q=80&w=1374&auto=format&fit=crop",
     location: ["Serangoon", "Kallang"],
     fee: 65,
     levels: ["Beginner"],
@@ -350,6 +358,7 @@ let instructorsData: Instructor[] = [
     bio: "Specialized in beginner-friendly coaching with a focus on building proper foundations. Makes tennis accessible and enjoyable for all.",
     phone: "98901234",
     rating: 4.6,
+    classSizes: [1, 2],
     reviews: [
       {
         id: "r8-1",
