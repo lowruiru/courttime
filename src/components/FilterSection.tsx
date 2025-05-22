@@ -50,9 +50,9 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
   };
   
   const resetFilters = () => {
-    // Set date to one week from now instead of today
-    const oneWeekFromNow = addDays(new Date(), 7);
-    oneWeekFromNow.setHours(0, 0, 0, 0);
+    // Set date to today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     
     const defaultFilters: FilterOptions = {
       instructorName: "",
@@ -60,7 +60,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
       budget: 200,
       level: "",
       needsCourt: false,
-      date: undefined, // Remove default date
+      date: today, // Set default to today
       timeRange: [6, 22]
     };
     setFilters(defaultFilters);
@@ -91,9 +91,9 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
       const newDate = addDays(filters.date, 1);
       handleFilterChange("date", newDate);
     } else {
-      const oneWeekFromNow = addDays(new Date(), 7);
-      oneWeekFromNow.setHours(0, 0, 0, 0);
-      handleFilterChange("date", oneWeekFromNow);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      handleFilterChange("date", today);
     }
   };
 
@@ -121,7 +121,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
         </div>
       </div>
       
-      <div className="grid grid-cols-7 gap-2">
+      <div className="grid grid-cols-6 gap-2 items-end">
         {/* Date Selection */}
         <div className="space-y-1 col-span-1">
           <Label htmlFor="date" className="text-xs">Date</Label>
@@ -173,20 +173,25 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
 
         {/* Time Range - Updated with improved UX */}
         <div className="space-y-1 col-span-2">
-          <Label htmlFor="timeRange" className="text-xs">Time</Label>
-          <div className="mt-1">
-            <div className="text-center mb-1 text-sm font-medium">
-              {formatTime(filters.timeRange[0])} - {formatTime(filters.timeRange[1])}
+          <Label htmlFor="timeRange" className="text-xs">Time Range</Label>
+          <div className="flex flex-col">
+            <div className="flex justify-between text-xs text-muted-foreground mb-1">
+              <span>{formatTime(filters.timeRange[0])}</span>
+              <span>{formatTime(filters.timeRange[1])}</span>
             </div>
             <Slider
               id="timeRange"
-              value={filters.timeRange}
+              value={[filters.timeRange[0], filters.timeRange[1]]}
               min={6}
               max={22}
               step={1}
-              onValueChange={(value) => handleFilterChange("timeRange", value)}
-              className="py-2 w-full"
+              onValueChange={([start, end]) => handleFilterChange("timeRange", [start, end])}
+              className="py-2"
             />
+            <div className="flex justify-between text-[10px] text-muted-foreground mt-0.5">
+              <span>Starting time</span>
+              <span>Ending time</span>
+            </div>
           </div>
         </div>
 
@@ -280,31 +285,30 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
           </Select>
         </div>
 
-        {/* Budget filter - now same length as time range */}
+        {/* Action Buttons - Moved to top row */}
         <div className="space-y-1 col-span-1">
-          <Label htmlFor="budget" className="text-xs">Budget: S${filters.budget}</Label>
-          <div className="flex items-center mt-3">
-            <Slider
-              id="budget"
-              value={[filters.budget]}
-              min={30}
-              max={200}
-              step={10}
-              onValueChange={(value) => handleFilterChange("budget", value[0])}
-              className="w-full py-2"
-            />
-          </div>
-        </div>
-        
-        {/* Action Buttons */}
-        <div className="space-y-1 col-span-1">
-          <Label className="text-xs invisible">Actions</Label> {/* Invisible label to align with other fields */}
-          <div className="flex gap-2 h-8 mt-1">
+          <div className="flex gap-2 h-8">
             <Button variant="outline" size="sm" onClick={resetFilters} className="h-8 text-xs">Reset</Button>
             <Button size="sm" className="bg-tennis-green hover:bg-tennis-green/90 h-8 text-xs" onClick={applyFilters}>
               Search
             </Button>
           </div>
+        </div>
+      </div>
+      
+      {/* Budget filter - now in a second row */}
+      <div className="mt-2">
+        <Label htmlFor="budget" className="text-xs">Budget: S${filters.budget}</Label>
+        <div className="flex items-center mt-1">
+          <Slider
+            id="budget"
+            value={[filters.budget]}
+            min={30}
+            max={200}
+            step={10}
+            onValueChange={(value) => handleFilterChange("budget", value[0])}
+            className="w-full py-2"
+          />
         </div>
       </div>
     </div>

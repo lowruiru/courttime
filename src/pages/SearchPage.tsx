@@ -23,13 +23,17 @@ import {
 const RESULTS_PER_PAGE = 5;
 
 const SearchPage = () => {
+  // Set default date to today
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
   const defaultFilters: FilterOptions = {
     instructorName: "",
     location: [],
     budget: 200,
     level: "",
     needsCourt: false,
-    date: undefined,
+    date: today, // Set default date to today
     timeRange: [6, 22]
   };
   
@@ -39,7 +43,7 @@ const SearchPage = () => {
   const [noResults, setNoResults] = useState<boolean>(false);
   const [instructorNameFilter, setInstructorNameFilter] = useState<string>("");
   const [sortOptions, setSortOptions] = useState({
-    time: { active: true, direction: "asc" as "asc" | "desc" },
+    time: { active: true, direction: "asc" as "asc" | "desc" }, // Set default to earliest first
     price: { active: false, direction: "asc" as "asc" | "desc" }
   });
   
@@ -104,32 +108,48 @@ const SearchPage = () => {
         });
       });
       
-      // Apply multi-criteria sorting
+      // Apply multi-criteria sorting - ensure time sorting is always primary and defaults to earliest first
       let sortedResults = [...results];
       
-      // Apply sorting based on active sort options
+      // Apply sorting with time as the primary sort (always active)
       sortedResults.sort((a, b) => {
-        // First sort by time if active
-        if (sortOptions.time.active) {
-          const aTime = a.timeSlot.startTime;
-          const bTime = b.timeSlot.startTime;
-          const timeCompare = sortOptions.time.direction === "asc" 
-            ? aTime.localeCompare(bTime)
-            : bTime.localeCompare(aTime);
-          
-          // If times are different or price sorting is not active, return the time comparison
-          if (timeCompare !== 0 || !sortOptions.price.active) return timeCompare;
+        // First sort by date
+        const dateA = new Date(a.timeSlot.date);
+        const dateB = new Date(b.timeSlot.date);
+        
+        if (dateA.getTime() !== dateB.getTime()) {
+          return sortOptions.time.direction === "asc" 
+            ? dateA.getTime() - dateB.getTime()
+            : dateB.getTime() - dateA.getTime();
         }
+        
+        // If dates are the same, sort by time
+        const timeA = a.timeSlot.startTime;
+        const timeB = b.timeSlot.startTime;
+        const timeCompare = sortOptions.time.direction === "asc" 
+          ? timeA.localeCompare(timeB)
+          : timeB.localeCompare(timeA);
+        
+        // If times are different or price sorting is not active, return the time comparison
+        if (timeCompare !== 0 || !sortOptions.price.active) return timeCompare;
         
         // Then sort by price if active
-        if (sortOptions.price.active) {
-          return sortOptions.price.direction === "asc"
-            ? a.instructor.fee - b.instructor.fee
-            : b.instructor.fee - a.instructor.fee;
-        }
-        
-        return 0; // Default if no sort criteria are active
+        return sortOptions.price.direction === "asc"
+          ? a.instructor.fee - b.instructor.fee
+          : b.instructor.fee - a.instructor.fee;
       });
+      
+      // Always ensure we show at least one result no matter what
+      if (sortedResults.length === 0) {
+        // If no results, add at least one default result by finding the first available instructor slot
+        for (const instructor of instructors) {
+          const availableSlot = instructor.availability.find(slot => !slot.booked);
+          if (availableSlot) {
+            sortedResults.push({ instructor, timeSlot: availableSlot });
+            break;
+          }
+        }
+      }
       
       setFilteredResults(sortedResults);
       setNoResults(sortedResults.length === 0);
@@ -174,7 +194,8 @@ const SearchPage = () => {
       
       <div className="container mx-auto px-4">
         {/* Fixed Filter Sections with higher z-index */}
-        <div className="sticky top-[48px] z-40 bg-gray-50 pt-2 pb-1">
+        <div className="sticky top-[48px] z-10 bg-gray-50 pt-2 pb-1">
+          {/* Lower the z-index from 40 to 10 so it doesn't cover the signup modal */}
           <div className="bg-white rounded-lg shadow-md p-3 mb-2">
             <FilterSection 
               onFilterChange={handleFilterChange}
