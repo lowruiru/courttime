@@ -60,7 +60,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
       budget: 200,
       level: "",
       needsCourt: false,
-      date: oneWeekFromNow,
+      date: undefined, // Remove default date
       timeRange: [6, 22]
     };
     setFilters(defaultFilters);
@@ -164,12 +164,16 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
           </div>
         </div>
 
-        {/* Time Range */}
+        {/* Time Range - Updated with two adjustment circles */}
         <div className="space-y-1 col-span-1">
           <Label htmlFor="timeRange" className="text-xs">
             {filters.timeRange[0].toString().padStart(2, '0')}:00-{filters.timeRange[1].toString().padStart(2, '0')}:00
           </Label>
           <div className="flex items-center">
+            {/* Start time adjustment circle */}
+            <div className="h-5 w-5 rounded-full border border-primary bg-background flex items-center justify-center mr-1">
+              <div className="h-2 w-2 rounded-full bg-primary"></div>
+            </div>
             <Slider
               id="timeRange"
               value={filters.timeRange}
@@ -179,8 +183,8 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
               onValueChange={(value) => handleFilterChange("timeRange", value)}
               className="py-2 w-full"
             />
-            {/* Add circle at the end of the slider */}
-            <div className="h-5 w-5 rounded-full border border-primary bg-background flex items-center justify-center">
+            {/* End time adjustment circle */}
+            <div className="h-5 w-5 rounded-full border border-primary bg-background flex items-center justify-center ml-1">
               <div className="h-2 w-2 rounded-full bg-primary"></div>
             </div>
           </div>
@@ -276,22 +280,30 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
           </Select>
         </div>
 
-        {/* Budget filter - moved next to level filter */}
+        {/* Budget filter - now same length as time range */}
         <div className="space-y-1 col-span-2">
           <Label htmlFor="budget" className="text-xs">Budget: S${filters.budget}</Label>
-          <Slider
-            id="budget"
-            value={[filters.budget]}
-            min={30}
-            max={200}
-            step={10}
-            onValueChange={(value) => handleFilterChange("budget", value[0])}
-            className="w-full py-2"
-          />
+          <div className="flex items-center">
+            <div className="h-5 w-5 invisible">
+              {/* Placeholder for symmetry */}
+            </div>
+            <Slider
+              id="budget"
+              value={[filters.budget]}
+              min={30}
+              max={200}
+              step={10}
+              onValueChange={(value) => handleFilterChange("budget", value[0])}
+              className="w-full py-2"
+            />
+            <div className="h-5 w-5 invisible">
+              {/* Placeholder for symmetry */}
+            </div>
+          </div>
         </div>
       </div>
       
-      {/* Filter Action Buttons */}
+      {/* Filter Action Buttons - Moved to the same row */}
       <div className="flex justify-end gap-3 mt-3">
         <Button variant="outline" size="sm" onClick={resetFilters} className="h-7 text-xs">Reset</Button>
         <Button size="sm" className="bg-tennis-green hover:bg-tennis-green/90 h-7 text-xs" onClick={applyFilters}>

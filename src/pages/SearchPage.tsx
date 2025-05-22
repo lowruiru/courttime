@@ -153,17 +153,17 @@ const SearchPage = () => {
             />
           </div>
           
-          {/* Sort Controls with Toggles - Add Instructor Name Filter */}
+          {/* Sort Controls with Toggles - Moved Instructor Name Filter */}
           <div className="bg-white rounded-lg shadow-md px-3 py-2 mb-0 flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <h2 className="text-sm font-semibold">
+            <div className="flex items-center gap-3">
+              <h2 className="text-sm font-semibold whitespace-nowrap">
                 {isLoading 
                   ? "Searching for instructors..." 
                   : `Available Instructors ${filteredResults.length > 0 ? `(${filteredResults.length})` : ''}`
                 }
               </h2>
               
-              {/* Add instructor name filter here */}
+              {/* Instructor name filter - moved next to "Available Instructors" */}
               <div className="relative">
                 <Input
                   placeholder="Search instructor..."
