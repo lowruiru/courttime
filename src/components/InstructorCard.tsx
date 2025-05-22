@@ -64,7 +64,7 @@ const InstructorCard = ({ instructor, timeSlot }: InstructorCardProps) => {
                   >
                     <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
                       <MessageCircle className="mr-1 h-3 w-3" />
-                      Book this slot
+                      Contact
                     </a>
                   </Button>
                   <Button 

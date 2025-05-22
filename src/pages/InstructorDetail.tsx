@@ -151,56 +151,59 @@ const InstructorDetail = () => {
                   <p>{instructor.bio}</p>
                 </div>
                 
-                               {/* Availability Section */}
+                {/* Availability Section */}
                 <div className="mt-8">
-                  <h2 className="text-xl font-semibold mb-4">Upcoming Availability (Next 7 Days)</h2>
-                  {Object.keys(groupedByDate).length === 0 ? (
-                    <div className="text-muted-foreground">No available slots in the next 7 days.</div>
-                  ) : (
-                    <div className="space-y-6">
-                      {Object.entries(groupedByDate).map(([dateStr, slots]) => {
-                        const dateObj = parse(dateStr, "yyyy-MM-dd", new Date());
+                  <h2 className="text-xl font-semibold mb-4">Upcoming Availability</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {instructor.availability
+                      .filter(slot => !slot.booked)
+                      .slice(0, 9)
+                      .map((slot) => {
+                        const date = parse(slot.date, "yyyy-MM-dd", new Date());
+                        const formattedDate = format(date, "EEE, MMM d, yyyy");
+                        const whatsappMessage = `Hi ${instructor.name}, I'm interested in booking a tennis lesson with you on ${formattedDate} at ${slot.startTime}.`;
+                        
                         return (
-                          <div key={dateStr} className="border rounded-md bg-gray-50">
-                            <div className="flex items-center gap-2 px-4 py-2 border-b bg-white">
-                              <Calendar className="h-4 w-4 text-tennis-green" />
-                              <span className="font-medium">{format(dateObj, "EEE, MMM d, yyyy")}</span>
+                          <div 
+                            key={`avail-${slot.id}`}
+                            className="bg-white border rounded-md overflow-hidden hover:shadow-md transition-shadow"
+                          >
+                            <div className="bg-gray-50 p-2 border-b">
+                              <div className="flex items-center gap-2 text-sm font-medium">
+                                <Calendar className="h-4 w-4 text-tennis-green" />
+                                <span>{format(date, "EEE, MMM d")}</span>
+                              </div>
                             </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-4">
-                              {slots.map(slot => {
-                                const whatsappMessage = `Hi ${instructor.name}, I'm interested in booking a tennis lesson with you on ${format(dateObj, "EEE, MMM d, yyyy")} at ${slot.startTime}.`;
-                                return (
-                                  <div 
-                                    key={slot.id}
-                                    className="bg-white border rounded-md overflow-hidden hover:shadow-md transition-shadow"
-                                  >
-                                    <div className="p-3 space-y-2">
-                                      <div className="flex items-center gap-2 text-sm">
-                                        <Clock className="h-4 w-4 text-muted-foreground" />
-                                        <span className="font-medium">{slot.startTime} - {slot.endTime}</span>
-                                      </div>
-                                      <div className="flex items-center gap-2 text-sm">
-                                        <MapPin className="h-4 w-4 text-muted-foreground" />
-                                        <span>{slot.location}</span>
-                                      </div>
-                                      <Button 
-                                        className="w-full mt-2 bg-tennis-green hover:bg-tennis-green/90"
-                                        size="sm"
-                                        asChild
-                                      >
-                                        <a href={`https://wa.me/${instructor.phone}?text=${encodeURIComponent(whatsappMessage)}`} target="_blank" rel="noopener noreferrer">
-                                          <MessageCircle className="mr-2 h-3 w-3" />
-                                          Book this slot
-                                        </a>
-                                      </Button>
-                                    </div>
-                                  </div>
-                                );
-                              })}
+                            <div className="p-3 space-y-2">
+                              <div className="flex items-center gap-2 text-sm">
+                                <Clock className="h-4 w-4 text-muted-foreground" />
+                                <span className="font-medium">{slot.startTime} - {slot.endTime}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-sm">
+                                <MapPin className="h-4 w-4 text-muted-foreground" />
+                                <span>{slot.location}</span>
+                              </div>
+                              <Button 
+                                className="w-full mt-2 bg-tennis-green hover:bg-tennis-green/90"
+                                size="sm"
+                                asChild
+                              >
+                                <a href={`https://wa.me/${instructor.phone}?text=${encodeURIComponent(whatsappMessage)}`} target="_blank" rel="noopener noreferrer">
+                                  <MessageCircle className="mr-2 h-3 w-3" />
+                                  Book this slot
+                                </a>
+                              </Button>
                             </div>
                           </div>
                         );
                       })}
+                  </div>
+                  
+                  {instructor.availability.filter(slot => !slot.booked).length > 9 && (
+                    <div className="text-center mt-4">
+                      <Button variant="outline" className="text-tennis-green border-tennis-green hover:bg-tennis-green/10">
+                        Show More Availability
+                      </Button>
                     </div>
                   )}
                 </div>
