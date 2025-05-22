@@ -21,7 +21,6 @@ import { FilterOptions, Levels, NeighborhoodsByRegion, AllNeighborhoods } from "
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
 import { CheckIcon, X } from "lucide-react";
-import { instructors } from "@/data/instructors";
 
 interface FilterSectionProps {
   onFilterChange: (filters: FilterOptions) => void;
@@ -41,27 +40,6 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
     
     return () => clearTimeout(timer);
   }, [filters, onFilterChange]);
-
-  // Effect to update date when instructor name is changed
-  useEffect(() => {
-    if (filters.instructorName && filters.instructorName.length > 2) {
-      const matchingInstructors = instructors.filter(instructor => 
-        instructor.name.toLowerCase().includes(filters.instructorName!.toLowerCase())
-      );
-      
-      if (matchingInstructors.length > 0) {
-        // Find the first available date for the instructor
-        const firstInstructor = matchingInstructors[0];
-        const availableSlots = firstInstructor.availability.filter(slot => !slot.booked);
-        
-        if (availableSlots.length > 0) {
-          const firstSlot = availableSlots[0];
-          const firstDate = new Date(firstSlot.date);
-          handleFilterChange("date", firstDate);
-        }
-      }
-    }
-  }, [filters.instructorName]);
 
   const handleFilterChange = (key: keyof FilterOptions, value: any) => {
     const newFilters = { ...filters, [key]: value };
@@ -83,8 +61,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
       level: "",
       needsCourt: false,
       date: today,
-      timeRange: [6, 22],
-      classSize: 1
+      timeRange: [6, 22]
     };
     setFilters(defaultFilters);
     onFilterChange(defaultFilters);
@@ -136,21 +113,18 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
             <Label htmlFor="needsCourt" className="text-xs">I need a court</Label>
           </div>
           
-          {/* Class Size Selector */}
-          <div className="flex items-center gap-2">
-            <Label htmlFor="classSize" className="text-xs">Class size:</Label>
-            <Select
-              value={filters.classSize?.toString() || "1"}
-              onValueChange={(value) => handleFilterChange("classSize", parseInt(value, 10))}
-            >
-              <SelectTrigger id="classSize" className="h-8 w-20 text-xs">
-                <SelectValue placeholder="Pax" />
-              </SelectTrigger>
-              <SelectContent align="start">
-                <SelectItem value="1">1 pax</SelectItem>
-                <SelectItem value="2">2 pax</SelectItem>
-              </SelectContent>
-            </Select>
+          {/* Budget filter */}
+          <div className="space-y-0 flex items-center gap-2">
+            <Label htmlFor="budget" className="text-xs whitespace-nowrap">Budget: S${filters.budget}</Label>
+            <Slider
+              id="budget"
+              value={[filters.budget]}
+              min={30}
+              max={200}
+              step={10}
+              onValueChange={(value) => handleFilterChange("budget", value[0])}
+              className="w-24"
+            />
           </div>
         </div>
       </div>
@@ -249,7 +223,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
               >
                 {filters.location.length > 0
                   ? `${filters.location.length} selected`
-                  : "All locations"}
+                  : "Select"}
                 <ChevronRight className="ml-1 h-4 w-4 shrink-0 rotate-90 opacity-50" />
               </Button>
             </PopoverTrigger>
@@ -313,10 +287,10 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
             onValueChange={(value) => handleFilterChange("level", value)}
           >
             <SelectTrigger id="level" className="h-8 text-xs">
-              <SelectValue placeholder="All levels" />
+              <SelectValue placeholder="Level" />
             </SelectTrigger>
             <SelectContent align="start">
-              <SelectItem value="">All levels</SelectItem>
+              <SelectItem value="all_levels">Any Level</SelectItem>
               {Levels.map((level) => (
                 <SelectItem key={level} value={level}>
                   {level}
@@ -324,20 +298,6 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
               ))}
             </SelectContent>
           </Select>
-        </div>
-        
-        {/* 6. Budget filter - Moved down next to level */}
-        <div className="space-y-1 col-span-1">
-          <Label htmlFor="budget" className="text-xs whitespace-nowrap">Budget: S${filters.budget}</Label>
-          <Slider
-            id="budget"
-            value={[filters.budget]}
-            min={30}
-            max={200}
-            step={10}
-            onValueChange={(value) => handleFilterChange("budget", value[0])}
-            className="py-2"
-          />
         </div>
       </div>
       

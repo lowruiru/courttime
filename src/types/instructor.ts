@@ -1,3 +1,4 @@
+
 export interface Instructor {
   id: string;
   name: string;
@@ -11,7 +12,6 @@ export interface Instructor {
   rating: number;
   reviews: Review[];
   availability: TimeSlot[];
-  classSizes: number[]; // Added class sizes that the instructor supports
 }
 
 export interface Review {
@@ -40,7 +40,6 @@ export interface FilterOptions {
   needsCourt: boolean;
   date: Date | undefined;
   timeRange: [number, number]; // 24h format, e.g. [8, 21] for 8am to 9pm
-  classSize: number; // Added class size option
 }
 
 // Format time to ensure 4 digits (HH:MM)
