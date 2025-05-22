@@ -151,7 +151,7 @@ const InstructorDetail = () => {
                   <p>{instructor.bio}</p>
                 </div>
                 
-                {/* Availability Section - Now comes before reviews */}
+                {/* Availability Section */}
                 <div className="mt-8">
                   <h2 className="text-xl font-semibold mb-4">Upcoming Availability</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -211,7 +211,7 @@ const InstructorDetail = () => {
             </Card>
           </div>
           
-          {/* Sidebar - now contains Reviews section */}
+          {/* Sidebar - Reviews and Ratings */}
           <div className="lg:col-span-1">
             <Card>
               <CardContent className="p-6">

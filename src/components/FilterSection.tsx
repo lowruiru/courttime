@@ -61,7 +61,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
       level: "",
       needsCourt: false,
       date: today,
-      timeRange: [6, 22]  // Changed to start at 06:00 and end at 22:00
+      timeRange: [6, 22]
     };
     setFilters(defaultFilters);
     onFilterChange(defaultFilters);
@@ -113,7 +113,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
             <Label htmlFor="needsCourt" className="text-xs">I need a court</Label>
           </div>
           
-          {/* Budget filter moved here */}
+          {/* Budget filter */}
           <div className="space-y-0 flex items-center gap-2">
             <Label htmlFor="budget" className="text-xs whitespace-nowrap">Budget: S${filters.budget}</Label>
             <Slider
@@ -123,15 +123,15 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
               max={200}
               step={10}
               onValueChange={(value) => handleFilterChange("budget", value[0])}
-              className="w-28"
+              className="w-24"
             />
           </div>
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
+      <div className="grid grid-cols-6 gap-2">
         {/* 1. Search by Instructor Name */}
-        <div className="space-y-1">
+        <div className="space-y-1 col-span-1">
           <Label htmlFor="instructorName" className="text-xs">Instructor Name</Label>
           <div className="relative">
             <Input
@@ -146,7 +146,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
         </div>
 
         {/* 2. Date Selection */}
-        <div className="space-y-1">
+        <div className="space-y-1 col-span-1">
           <Label htmlFor="date" className="text-xs">Date</Label>
           <div className="flex h-8 space-x-1">
             <Button
@@ -164,12 +164,12 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
                   id="date"
                   variant="outline"
                   className={cn(
-                    "flex-1 justify-start text-left font-normal h-8 text-xs",
+                    "w-full justify-start text-left font-normal h-8 text-xs px-2",
                     !filters.date && "text-muted-foreground"
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-3 w-3" />
-                  {filters.date ? format(filters.date, "EEE, MMM d") : <span>Pick a date</span>}
+                  <CalendarIcon className="mr-1 h-3 w-3" />
+                  {filters.date ? format(filters.date, "MMM d") : <span>Pick</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -195,15 +195,15 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
         </div>
 
         {/* 3. Time Range */}
-        <div className="space-y-1">
+        <div className="space-y-1 col-span-1">
           <Label htmlFor="timeRange" className="text-xs">
-            Time: {filters.timeRange[0].toString().padStart(2, '0')}:00 - {filters.timeRange[1].toString().padStart(2, '0')}:00
+            {filters.timeRange[0].toString().padStart(2, '0')}:00-{filters.timeRange[1].toString().padStart(2, '0')}:00
           </Label>
           <Slider
             id="timeRange"
             value={filters.timeRange}
-            min={6}  // Changed to start at 06:00
-            max={22}  // End at 22:00
+            min={6}
+            max={22}
             step={1}
             onValueChange={(value) => handleFilterChange("timeRange", value)}
             className="py-2"
@@ -211,7 +211,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
         </div>
 
         {/* 4. Location */}
-        <div className="space-y-1">
+        <div className="space-y-1 col-span-1">
           <Label htmlFor="location" className="text-xs">Location</Label>
           <Popover open={locationCommandOpen} onOpenChange={setLocationCommandOpen}>
             <PopoverTrigger asChild>
@@ -223,8 +223,8 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
               >
                 {filters.location.length > 0
                   ? `${filters.location.length} selected`
-                  : "Select locations"}
-                <ChevronRight className="ml-2 h-4 w-4 shrink-0 rotate-90 opacity-50" />
+                  : "Select"}
+                <ChevronRight className="ml-1 h-4 w-4 shrink-0 rotate-90 opacity-50" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[220px] p-0" align="start">
@@ -261,7 +261,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
           </Popover>
           {filters.location.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-1">
-              {filters.location.slice(0, 2).map((location) => (
+              {filters.location.slice(0, 1).map((location) => (
                 <Badge key={location} variant="outline" className="text-[10px] h-5 px-1">
                   {location}
                   <X 
@@ -270,9 +270,9 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
                   />
                 </Badge>
               ))}
-              {filters.location.length > 2 && (
+              {filters.location.length > 1 && (
                 <Badge variant="outline" className="text-[10px] h-5 px-1">
-                  +{filters.location.length - 2} more
+                  +{filters.location.length - 1} more
                 </Badge>
               )}
             </div>
@@ -280,14 +280,14 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
         </div>
         
         {/* 5. Level */}
-        <div className="space-y-1">
+        <div className="space-y-1 col-span-1">
           <Label htmlFor="level" className="text-xs">Level</Label>
           <Select
             value={filters.level}
             onValueChange={(value) => handleFilterChange("level", value)}
           >
             <SelectTrigger id="level" className="h-8 text-xs">
-              <SelectValue placeholder="Select level" />
+              <SelectValue placeholder="Level" />
             </SelectTrigger>
             <SelectContent align="start">
               <SelectItem value="all_levels">Any Level</SelectItem>

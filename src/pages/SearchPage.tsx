@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import FilterSection from "@/components/FilterSection";
@@ -20,7 +21,7 @@ const SearchPage = () => {
     level: "",
     needsCourt: false,
     date: today,
-    timeRange: [6, 22] // Changed to start at 06:00 and end at 22:00
+    timeRange: [6, 22]
   };
   
   const [filters, setFilters] = useState<FilterOptions>(defaultFilters);
@@ -142,8 +143,8 @@ const SearchPage = () => {
       <Header />
       
       <div className="container mx-auto px-4">
-        {/* Compact Filter Section */}
-        <div className="sticky top-[48px] z-40 bg-gray-50 pt-2 pb-1">
+        {/* Fixed Filter Sections with higher z-index */}
+        <div className="sticky top-[48px] z-50 bg-gray-50 pt-2 pb-1">
           <div className="bg-white rounded-lg shadow-md p-3 mb-2">
             <FilterSection 
               onFilterChange={handleFilterChange}
@@ -152,7 +153,7 @@ const SearchPage = () => {
           </div>
           
           {/* Sort Controls with Toggles */}
-          <div className="bg-white rounded-lg shadow-md px-3 py-2 mb-3 flex justify-between items-center">
+          <div className="bg-white rounded-lg shadow-md px-3 py-2 mb-0 flex justify-between items-center">
             <h2 className="text-sm font-semibold">
               {isLoading 
                 ? "Searching for instructors..." 
@@ -197,37 +198,40 @@ const SearchPage = () => {
           </div>
         </div>
         
-        {/* Results Section */}
-        <div className="mb-6 pt-1">
-          {isLoading ? (
-            // Loading state 
-            <div className="flex justify-center py-4">
-              <div className="animate-pulse space-y-3 w-full">
-                {[...Array(3)].map((_, index) => (
-                  <div key={index} className="bg-white rounded-lg shadow-sm h-36" />
+        {/* Add an extra margin/padding for better scroll appearance */}
+        <div className="pt-3">
+          {/* Results Section */}
+          <div className="mb-6">
+            {isLoading ? (
+              // Loading state 
+              <div className="flex justify-center py-4">
+                <div className="animate-pulse space-y-3 w-full">
+                  {[...Array(3)].map((_, index) => (
+                    <div key={index} className="bg-white rounded-lg shadow-sm h-36" />
+                  ))}
+                </div>
+              </div>
+            ) : noResults ? (
+              // No results state
+              <div className="bg-white rounded-lg shadow-sm p-6 text-center">
+                <h3 className="text-lg font-medium mb-2">No instructors found</h3>
+                <p className="text-muted-foreground mb-3">
+                  Try adjusting your filters to see more results.
+                </p>
+              </div>
+            ) : (
+              // Results list
+              <div>
+                {filteredResults.map(({ instructor, timeSlot }) => (
+                  <InstructorCard 
+                    key={`${instructor.id}-${timeSlot.id}`}
+                    instructor={instructor} 
+                    timeSlot={timeSlot}
+                  />
                 ))}
               </div>
-            </div>
-          ) : noResults ? (
-            // No results state
-            <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-              <h3 className="text-lg font-medium mb-2">No instructors found</h3>
-              <p className="text-muted-foreground mb-3">
-                Try adjusting your filters to see more results.
-              </p>
-            </div>
-          ) : (
-            // Results list
-            <div>
-              {filteredResults.map(({ instructor, timeSlot }) => (
-                <InstructorCard 
-                  key={`${instructor.id}-${timeSlot.id}`}
-                  instructor={instructor} 
-                  timeSlot={timeSlot}
-                />
-              ))}
-            </div>
-          )}
+            )}
+          </div>
         </div>
         
         {/* Disclaimer Footer */}
