@@ -5,9 +5,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import Header from '@/components/Header';
 import { instructors } from '@/data/instructors';
-import { format, parse } from "date-fns";
-import { Calendar, CheckCircle, Clock, MessageCircle, ArrowLeft, MapPin } from 'lucide-react';
-import { useEffect } from 'react';
+import { format, parse, addDays, isBefore, compareAsc } from "date-fns";
+import { Calendar, CheckCircle, Clock, MessageCircle, ArrowLeft, MapPin, Users } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { TimeSlot } from '@/types/instructor';
 
 const InstructorDetail = () => {
   const { id } = useParams();
@@ -22,6 +23,62 @@ const InstructorDetail = () => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
   }, [instructor, id]);
+  
+  // Group availability by date
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  
+  useEffect(() => {
+    if (instructor && instructor.availability.length > 0) {
+      // Find the first non-booked slot's date
+      const firstAvailableSlot = instructor.availability.find(slot => !slot.booked);
+      if (firstAvailableSlot) {
+        setSelectedDate(parse(firstAvailableSlot.date, "yyyy-MM-dd", new Date()));
+      }
+    }
+  }, [instructor]);
+  
+  // Group time slots by date and filter for the selected date + 1 week
+  const groupedAvailability = () => {
+    if (!instructor || !selectedDate) return {};
+    
+    const oneWeekLater = addDays(selectedDate, 7);
+    
+    const availableSlots = instructor.availability
+      .filter(slot => {
+        if (slot.booked) return false;
+        
+        const slotDate = parse(slot.date, "yyyy-MM-dd", new Date());
+        return (
+          !isBefore(slotDate, selectedDate) && 
+          isBefore(slotDate, oneWeekLater)
+        );
+      })
+      .sort((a, b) => {
+        // First sort by date
+        const dateCompare = compareAsc(
+          parse(a.date, "yyyy-MM-dd", new Date()),
+          parse(b.date, "yyyy-MM-dd", new Date())
+        );
+        
+        // If same date, sort by time
+        if (dateCompare === 0) {
+          return a.startTime.localeCompare(b.startTime);
+        }
+        
+        return dateCompare;
+      });
+    
+    // Group by date
+    const grouped: Record<string, TimeSlot[]> = {};
+    availableSlots.forEach(slot => {
+      if (!grouped[slot.date]) {
+        grouped[slot.date] = [];
+      }
+      grouped[slot.date].push(slot);
+    });
+    
+    return grouped;
+  };
   
   if (!instructor) {
     return (
@@ -41,6 +98,8 @@ const InstructorDetail = () => {
       </div>
     );
   }
+
+  const availability = groupedAvailability();
 
   return (
     <div>
@@ -115,6 +174,21 @@ const InstructorDetail = () => {
                       </div>
                       
                       <div>
+                        <h3 className="font-medium">Class Sizes</h3>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {instructor.classSizes.map((size) => (
+                            <span 
+                              key={size}
+                              className="px-2 py-1 bg-muted rounded-full text-xs inline-flex items-center"
+                            >
+                              <Users className="h-3 w-3 mr-1" />
+                              {size} {size > 1 ? 'pax' : 'pax'}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div>
                         <h3 className="font-medium">Court</h3>
                         <p className="flex items-center gap-2">
                           {instructor.providesOwnCourt ? (
@@ -154,57 +228,58 @@ const InstructorDetail = () => {
                 {/* Availability Section */}
                 <div className="mt-8">
                   <h2 className="text-xl font-semibold mb-4">Upcoming Availability</h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {instructor.availability
-                      .filter(slot => !slot.booked)
-                      .slice(0, 9)
-                      .map((slot) => {
-                        const date = parse(slot.date, "yyyy-MM-dd", new Date());
+                  {Object.keys(availability).length > 0 ? (
+                    <div>
+                      {Object.entries(availability).map(([dateStr, slots]) => {
+                        const date = parse(dateStr, "yyyy-MM-dd", new Date());
                         const formattedDate = format(date, "EEE, MMM d, yyyy");
-                        const whatsappMessage = `Hi ${instructor.name}, I'm interested in booking a tennis lesson with you on ${formattedDate} at ${slot.startTime}.`;
                         
                         return (
-                          <div 
-                            key={`avail-${slot.id}`}
-                            className="bg-white border rounded-md overflow-hidden hover:shadow-md transition-shadow"
-                          >
-                            <div className="bg-gray-50 p-2 border-b">
-                              <div className="flex items-center gap-2 text-sm font-medium">
-                                <Calendar className="h-4 w-4 text-tennis-green" />
-                                <span>{format(date, "EEE, MMM d")}</span>
-                              </div>
-                            </div>
-                            <div className="p-3 space-y-2">
-                              <div className="flex items-center gap-2 text-sm">
-                                <Clock className="h-4 w-4 text-muted-foreground" />
-                                <span className="font-medium">{slot.startTime} - {slot.endTime}</span>
-                              </div>
-                              <div className="flex items-center gap-2 text-sm">
-                                <MapPin className="h-4 w-4 text-muted-foreground" />
-                                <span>{slot.location}</span>
-                              </div>
-                              <Button 
-                                className="w-full mt-2 bg-tennis-green hover:bg-tennis-green/90"
-                                size="sm"
-                                asChild
-                              >
-                                <a href={`https://wa.me/${instructor.phone}?text=${encodeURIComponent(whatsappMessage)}`} target="_blank" rel="noopener noreferrer">
-                                  <MessageCircle className="mr-2 h-3 w-3" />
-                                  Book this slot
-                                </a>
-                              </Button>
+                          <div key={dateStr} className="mb-6">
+                            <h3 className="font-medium mb-3 flex items-center">
+                              <Calendar className="h-4 w-4 mr-2 text-tennis-green" />
+                              {formattedDate}
+                            </h3>
+                            
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                              {slots.map((slot) => {
+                                const whatsappMessage = `Hi ${instructor.name}, I'm interested in booking a tennis lesson with you on ${formattedDate} at ${slot.startTime}.`;
+                                
+                                return (
+                                  <div 
+                                    key={`avail-${slot.id}`}
+                                    className="bg-white border rounded-md overflow-hidden hover:shadow-md transition-shadow"
+                                  >
+                                    <div className="p-3 space-y-2">
+                                      <div className="flex items-center gap-2 text-sm">
+                                        <Clock className="h-4 w-4 text-muted-foreground" />
+                                        <span className="font-medium">{slot.startTime} - {slot.endTime}</span>
+                                      </div>
+                                      <div className="flex items-center gap-2 text-sm">
+                                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                                        <span>{slot.location}</span>
+                                      </div>
+                                      <Button 
+                                        className="w-full mt-2 bg-tennis-green hover:bg-tennis-green/90"
+                                        size="sm"
+                                        asChild
+                                      >
+                                        <a href={`https://wa.me/${instructor.phone}?text=${encodeURIComponent(whatsappMessage)}`} target="_blank" rel="noopener noreferrer">
+                                          <MessageCircle className="mr-2 h-3 w-3" />
+                                          Book this slot
+                                        </a>
+                                      </Button>
+                                    </div>
+                                  </div>
+                                );
+                              })}
                             </div>
                           </div>
                         );
                       })}
-                  </div>
-                  
-                  {instructor.availability.filter(slot => !slot.booked).length > 9 && (
-                    <div className="text-center mt-4">
-                      <Button variant="outline" className="text-tennis-green border-tennis-green hover:bg-tennis-green/10">
-                        Show More Availability
-                      </Button>
                     </div>
+                  ) : (
+                    <p>No upcoming availability in the next week.</p>
                   )}
                 </div>
               </CardContent>
@@ -239,21 +314,6 @@ const InstructorDetail = () => {
                   ) : (
                     <p>No reviews yet.</p>
                   )}
-                </div>
-                
-                {/* Google Sign In Button for Feedback */}
-                <div className="mt-8">
-                  <button
-                    className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 transition text-sm w-full"
-                    onClick={() => window.location.href = "https://accounts.google.com/signin"}
-                  >
-                    <img
-                      src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                      alt="Google"
-                      className="h-5 w-5"
-                    />
-                    <span>Sign in with Google to submit feedback</span>
-                  </button>
                 </div>
               </CardContent>
             </Card>
