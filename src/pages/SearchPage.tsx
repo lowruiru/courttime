@@ -21,8 +21,7 @@ const SearchPage = () => {
     level: "",
     needsCourt: false,
     date: today,
-    timeRange: [6, 22],
-    classSize: 1
+    timeRange: [6, 22]
   };
   
   const [filters, setFilters] = useState<FilterOptions>(defaultFilters);
@@ -61,9 +60,6 @@ const SearchPage = () => {
         
         // Filter by court availability if needed
         if (filters.needsCourt && !instructor.providesOwnCourt) return;
-
-        // Filter by class size (if instructor supports it)
-        if (!instructor.classSizes.includes(filters.classSize)) return;
         
         // Filter by date and time slots
         const availableSlots = instructor.availability.filter(slot => {
@@ -92,9 +88,7 @@ const SearchPage = () => {
       
       // Apply sorting based on active sort options
       sortedResults.sort((a, b) => {
-        let comparison = 0;
-        
-        // Sort by time if active
+        // First sort by time if active
         if (sortOptions.time.active) {
           const aTime = a.timeSlot.startTime;
           const bTime = b.timeSlot.startTime;
@@ -102,19 +96,18 @@ const SearchPage = () => {
             ? aTime.localeCompare(bTime)
             : bTime.localeCompare(aTime);
           
-          comparison = timeCompare;
+          // If times are different or price sorting is not active, return the time comparison
+          if (timeCompare !== 0 || !sortOptions.price.active) return timeCompare;
         }
         
-        // Sort by price if active
-        if (sortOptions.price.active && comparison === 0) {
-          const priceCompare = sortOptions.price.direction === "asc"
+        // Then sort by price if active
+        if (sortOptions.price.active) {
+          return sortOptions.price.direction === "asc"
             ? a.instructor.fee - b.instructor.fee
             : b.instructor.fee - a.instructor.fee;
-          
-          comparison = priceCompare;
         }
         
-        return comparison;
+        return 0; // Default if no sort criteria are active
       });
       
       setFilteredResults(sortedResults);
@@ -234,7 +227,6 @@ const SearchPage = () => {
                     key={`${instructor.id}-${timeSlot.id}`}
                     instructor={instructor} 
                     timeSlot={timeSlot}
-                    classSize={filters.classSize}
                   />
                 ))}
               </div>
