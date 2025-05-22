@@ -15,7 +15,7 @@ const InstructorSignupModal: React.FC<{ open: boolean; onClose: () => void }> = 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-40">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black bg-opacity-40">
       <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative">
         <button
           onClick={onClose}

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import FilterSection from "@/components/FilterSection";
@@ -28,7 +29,7 @@ const SearchPage = () => {
     budget: 200,
     level: "",
     needsCourt: false,
-    date: undefined, // Remove default date
+    date: undefined,
     timeRange: [6, 22]
   };
   
@@ -44,31 +45,10 @@ const SearchPage = () => {
   
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-
-  // Ensure we only display 5 different instructors per page
-  const processResults = (results: { instructor: Instructor, timeSlot: TimeSlot }[]) => {
-    // Group results by instructor ID
-    const instructorGroups = results.reduce((acc, curr) => {
-      const id = curr.instructor.id;
-      if (!acc[id]) {
-        acc[id] = [];
-      }
-      acc[id].push(curr);
-      return acc;
-    }, {} as Record<string, { instructor: Instructor, timeSlot: TimeSlot }[]>);
-    
-    // For each instructor, keep only their earliest time slot
-    const uniqueInstructors = Object.values(instructorGroups).map(group => 
-      group.sort((a, b) => a.timeSlot.startTime.localeCompare(b.timeSlot.startTime))[0]
-    );
-    
-    return uniqueInstructors;
-  };
   
-  // Calculate total pages and paginate unique instructors
-  const uniqueInstructors = processResults(filteredResults);
-  const totalPages = Math.ceil(uniqueInstructors.length / RESULTS_PER_PAGE);
-  const paginatedResults = uniqueInstructors.slice(
+  // Calculate total pages and paginate results
+  const totalPages = Math.ceil(filteredResults.length / RESULTS_PER_PAGE);
+  const paginatedResults = filteredResults.slice(
     (currentPage - 1) * RESULTS_PER_PAGE,
     currentPage * RESULTS_PER_PAGE
   );
@@ -283,12 +263,12 @@ const SearchPage = () => {
                 </p>
               </div>
             ) : (
-              // Results list with pagination
+              // Results list with pagination - showing exactly 5 results per page
               <>
                 <div>
-                  {paginatedResults.map(({ instructor, timeSlot }) => (
+                  {paginatedResults.map(({ instructor, timeSlot }, index) => (
                     <InstructorCard 
-                      key={`${instructor.id}-${timeSlot.id}`}
+                      key={`${instructor.id}-${timeSlot.id}-${index}`}
                       instructor={instructor} 
                       timeSlot={timeSlot}
                     />
@@ -296,7 +276,7 @@ const SearchPage = () => {
                 </div>
                 
                 {/* Pagination */}
-                {uniqueInstructors.length > RESULTS_PER_PAGE && (
+                {filteredResults.length > RESULTS_PER_PAGE && (
                   <Pagination className="my-6">
                     <PaginationContent>
                       {currentPage > 1 && (

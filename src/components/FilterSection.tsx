@@ -97,6 +97,13 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
     }
   };
 
+  // Format time for display
+  const formatTime = (hour: number) => {
+    const period = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+    return `${displayHour}:00 ${period}`;
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-3">
@@ -114,7 +121,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
         </div>
       </div>
       
-      <div className="grid grid-cols-6 gap-2">
+      <div className="grid grid-cols-7 gap-2">
         {/* Date Selection */}
         <div className="space-y-1 col-span-1">
           <Label htmlFor="date" className="text-xs">Date</Label>
@@ -165,12 +172,12 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
         </div>
 
         {/* Time Range - Updated with improved UX */}
-        <div className="space-y-1 col-span-1">
-          <Label htmlFor="timeRange" className="text-xs flex justify-between">
-            <span>Start: {filters.timeRange[0].toString().padStart(2, '0')}:00</span>
-            <span>End: {filters.timeRange[1].toString().padStart(2, '0')}:00</span>
-          </Label>
-          <div className="flex items-center">
+        <div className="space-y-1 col-span-2">
+          <Label htmlFor="timeRange" className="text-xs">Time</Label>
+          <div className="mt-1">
+            <div className="text-center mb-1 text-sm font-medium">
+              {formatTime(filters.timeRange[0])} - {formatTime(filters.timeRange[1])}
+            </div>
             <Slider
               id="timeRange"
               value={filters.timeRange}
@@ -276,7 +283,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
         {/* Budget filter - now same length as time range */}
         <div className="space-y-1 col-span-1">
           <Label htmlFor="budget" className="text-xs">Budget: S${filters.budget}</Label>
-          <div className="flex items-center">
+          <div className="flex items-center mt-3">
             <Slider
               id="budget"
               value={[filters.budget]}
@@ -289,10 +296,10 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
           </div>
         </div>
         
-        {/* Action Buttons - Moved to the same row */}
+        {/* Action Buttons */}
         <div className="space-y-1 col-span-1">
           <Label className="text-xs invisible">Actions</Label> {/* Invisible label to align with other fields */}
-          <div className="flex gap-2 h-8">
+          <div className="flex gap-2 h-8 mt-1">
             <Button variant="outline" size="sm" onClick={resetFilters} className="h-8 text-xs">Reset</Button>
             <Button size="sm" className="bg-tennis-green hover:bg-tennis-green/90 h-8 text-xs" onClick={applyFilters}>
               Search
