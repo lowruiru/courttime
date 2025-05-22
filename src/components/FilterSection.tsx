@@ -97,11 +97,9 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
     }
   };
 
-  // Format time for display
+  // Format time for display in 24h format with leading zeros
   const formatTime = (hour: number) => {
-    const period = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-    return `${displayHour}:00 ${period}`;
+    return `${hour.toString().padStart(2, '0')}:00`;
   };
 
   return (
@@ -121,9 +119,9 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
         </div>
       </div>
       
-      <div className="grid grid-cols-6 gap-2 items-end">
+      <div className="grid grid-cols-12 gap-2 items-center">
         {/* Date Selection */}
-        <div className="space-y-1 col-span-1">
+        <div className="space-y-1 col-span-2">
           <Label htmlFor="date" className="text-xs">Date</Label>
           <div className="flex h-8 space-x-1">
             <Button
@@ -171,32 +169,22 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
           </div>
         </div>
 
-        {/* Time Range - Updated with improved UX */}
-        <div className="space-y-1 col-span-2">
-          <Label htmlFor="timeRange" className="text-xs">Time Range</Label>
-          <div className="flex flex-col">
-            <div className="flex justify-between text-xs text-muted-foreground mb-1">
-              <span>{formatTime(filters.timeRange[0])}</span>
-              <span>{formatTime(filters.timeRange[1])}</span>
-            </div>
-            <Slider
-              id="timeRange"
-              value={[filters.timeRange[0], filters.timeRange[1]]}
-              min={6}
-              max={22}
-              step={1}
-              onValueChange={([start, end]) => handleFilterChange("timeRange", [start, end])}
-              className="py-2"
-            />
-            <div className="flex justify-between text-[10px] text-muted-foreground mt-0.5">
-              <span>Starting time</span>
-              <span>Ending time</span>
-            </div>
-          </div>
+        {/* Time Range - Improved UX with 24h format */}
+        <div className="space-y-1 col-span-3">
+          <Label htmlFor="timeRange" className="text-xs">Time: {formatTime(filters.timeRange[0])} - {formatTime(filters.timeRange[1])}</Label>
+          <Slider
+            id="timeRange"
+            value={[filters.timeRange[0], filters.timeRange[1]]}
+            min={6}
+            max={22}
+            step={1}
+            onValueChange={([start, end]) => handleFilterChange("timeRange", [start, end])}
+            className="py-2"
+          />
         </div>
-
+        
         {/* Location */}
-        <div className="space-y-1 col-span-1">
+        <div className="space-y-1 col-span-2">
           <Label htmlFor="location" className="text-xs">Location</Label>
           <Popover open={locationCommandOpen} onOpenChange={setLocationCommandOpen}>
             <PopoverTrigger asChild>
@@ -265,7 +253,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
         </div>
         
         {/* Level */}
-        <div className="space-y-1 col-span-1">
+        <div className="space-y-1 col-span-2">
           <Label htmlFor="level" className="text-xs">Level</Label>
           <Select
             value={filters.level}
@@ -285,21 +273,9 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
           </Select>
         </div>
 
-        {/* Action Buttons - Moved to top row */}
-        <div className="space-y-1 col-span-1">
-          <div className="flex gap-2 h-8">
-            <Button variant="outline" size="sm" onClick={resetFilters} className="h-8 text-xs">Reset</Button>
-            <Button size="sm" className="bg-tennis-green hover:bg-tennis-green/90 h-8 text-xs" onClick={applyFilters}>
-              Search
-            </Button>
-          </div>
-        </div>
-      </div>
-      
-      {/* Budget filter - now in a second row */}
-      <div className="mt-2">
-        <Label htmlFor="budget" className="text-xs">Budget: S${filters.budget}</Label>
-        <div className="flex items-center mt-1">
+        {/* Budget - Moved next to Level */}
+        <div className="space-y-1 col-span-2">
+          <Label htmlFor="budget" className="text-xs">Budget: S${filters.budget}</Label>
           <Slider
             id="budget"
             value={[filters.budget]}
@@ -307,8 +283,20 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
             max={200}
             step={10}
             onValueChange={(value) => handleFilterChange("budget", value[0])}
-            className="w-full py-2"
+            className="py-2"
           />
+        </div>
+        
+        {/* Action Buttons - Moved to the same row */}
+        <div className="col-span-1">
+          <Label className="text-xs opacity-0">Actions</Label>
+          <Button variant="outline" size="sm" onClick={resetFilters} className="h-8 text-xs w-full">Reset</Button>
+        </div>
+        <div className="col-span-2">
+          <Label className="text-xs opacity-0">Actions</Label>
+          <Button size="sm" className="bg-tennis-green hover:bg-tennis-green/90 h-8 text-xs w-full" onClick={applyFilters}>
+            Search
+          </Button>
         </div>
       </div>
     </div>

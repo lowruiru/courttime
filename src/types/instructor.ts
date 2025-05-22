@@ -10,6 +10,7 @@ export interface Instructor {
   bio: string;
   phone: string;
   rating: number;
+  specialization?: string;
   reviews: Review[];
   availability: TimeSlot[];
 }

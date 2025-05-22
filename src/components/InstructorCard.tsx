@@ -56,7 +56,7 @@ const InstructorCard = ({ instructor, timeSlot }: InstructorCardProps) => {
                   </p>
                 </div>
                 
-                {/* Action Buttons - Update button text */}
+                {/* Action Buttons */}
                 <div className="flex gap-2 mt-2">
                   <Button 
                     className="bg-tennis-green hover:bg-tennis-green/90 py-1 px-3 h-auto text-xs"
@@ -80,9 +80,10 @@ const InstructorCard = ({ instructor, timeSlot }: InstructorCardProps) => {
               </div>
             </div>
             
-            {/* Levels and Location */}
+            {/* Levels and Location - Added Specialization */}
             <div className="mt-3">
               <p className="text-sm"><span className="font-medium">Teaches:</span> {instructor.levels.join(", ")}</p>
+              <p className="text-sm"><span className="font-medium">Specialization:</span> {instructor.specialization || "General tennis"}</p>
               <p className="text-sm"><span className="font-medium">Location:</span> {timeSlot.location}</p>
             </div>
           </div>

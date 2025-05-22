@@ -45,9 +45,26 @@ const InstructorDetail = () => {
       groupedByDate[slot.date].push(slot);
     });
     
-    // Sort time slots within each date
+    // Sort time slots within each date and remove duplicates
     Object.keys(groupedByDate).forEach(date => {
-      groupedByDate[date].sort((a, b) => a.startTime.localeCompare(b.startTime));
+      const uniqueTimeSlots: TimeSlot[] = [];
+      const timeSet = new Set<string>();
+      
+      // Sort by start time
+      const sortedSlots = [...groupedByDate[date]].sort((a, b) => 
+        a.startTime.localeCompare(b.startTime)
+      );
+      
+      // Filter out duplicates based on startTime and endTime combination
+      sortedSlots.forEach(slot => {
+        const timeKey = `${slot.startTime}-${slot.endTime}-${slot.location}`;
+        if (!timeSet.has(timeKey)) {
+          timeSet.add(timeKey);
+          uniqueTimeSlots.push(slot);
+        }
+      });
+      
+      groupedByDate[date] = uniqueTimeSlots;
     });
     
     setGroupedAvailability(groupedByDate);
@@ -145,6 +162,12 @@ const InstructorDetail = () => {
                             </span>
                           ))}
                         </div>
+                      </div>
+                      
+                      {/* Added Specialization */}
+                      <div>
+                        <h3 className="font-medium">Specialization</h3>
+                        <p>{instructor.specialization || "General tennis"}</p>
                       </div>
                       
                       <div>
