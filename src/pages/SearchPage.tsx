@@ -11,9 +11,18 @@ import { ArrowDown, ArrowUp } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious 
+} from "@/components/ui/pagination";
+
+const RESULTS_PER_PAGE = 5;
 
 const SearchPage = () => {
-  // Remove today as default date
   const defaultFilters: FilterOptions = {
     instructorName: "",
     location: [],
@@ -34,10 +43,19 @@ const SearchPage = () => {
     price: { active: false, direction: "asc" as "asc" | "desc" }
   });
   
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(filteredResults.length / RESULTS_PER_PAGE);
+  const paginatedResults = filteredResults.slice(
+    (currentPage - 1) * RESULTS_PER_PAGE,
+    currentPage * RESULTS_PER_PAGE
+  );
+  
   // Apply filters to instructors and their availability
   useEffect(() => {
     setIsLoading(true);
     setNoResults(false);
+    setCurrentPage(1); // Reset to first page on filter change
     
     // Simulate API delay for realistic UX
     const timer = setTimeout(() => {
@@ -138,6 +156,15 @@ const SearchPage = () => {
       return newOptions;
     });
   };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll back to top of results
+    window.scrollTo({
+      top: document.querySelector('.sticky')?.getBoundingClientRect().bottom || 0,
+      behavior: 'smooth'
+    });
+  };
   
   return (
     <div className="min-h-screen bg-gray-50">
@@ -145,7 +172,7 @@ const SearchPage = () => {
       
       <div className="container mx-auto px-4">
         {/* Fixed Filter Sections with higher z-index */}
-        <div className="sticky top-[48px] z-50 bg-gray-50 pt-2 pb-1">
+        <div className="sticky top-[48px] z-40 bg-gray-50 pt-2 pb-1">
           <div className="bg-white rounded-lg shadow-md p-3 mb-2">
             <FilterSection 
               onFilterChange={handleFilterChange}
@@ -159,7 +186,7 @@ const SearchPage = () => {
               <h2 className="text-sm font-semibold whitespace-nowrap">
                 {isLoading 
                   ? "Searching for instructors..." 
-                  : `Available Instructors ${filteredResults.length > 0 ? `(${filteredResults.length})` : ''}`
+                  : "Available Instructors"
                 }
               </h2>
               
@@ -234,16 +261,69 @@ const SearchPage = () => {
                 </p>
               </div>
             ) : (
-              // Results list
-              <div>
-                {filteredResults.map(({ instructor, timeSlot }) => (
-                  <InstructorCard 
-                    key={`${instructor.id}-${timeSlot.id}`}
-                    instructor={instructor} 
-                    timeSlot={timeSlot}
-                  />
-                ))}
-              </div>
+              // Results list with pagination
+              <>
+                <div>
+                  {paginatedResults.map(({ instructor, timeSlot }) => (
+                    <InstructorCard 
+                      key={`${instructor.id}-${timeSlot.id}`}
+                      instructor={instructor} 
+                      timeSlot={timeSlot}
+                    />
+                  ))}
+                </div>
+                
+                {/* Pagination */}
+                {filteredResults.length > RESULTS_PER_PAGE && (
+                  <Pagination className="my-6">
+                    <PaginationContent>
+                      {currentPage > 1 && (
+                        <PaginationItem>
+                          <PaginationPrevious onClick={() => handlePageChange(currentPage - 1)} />
+                        </PaginationItem>
+                      )}
+                      
+                      {[...Array(totalPages)].map((_, index) => {
+                        const pageNumber = index + 1;
+                        // Show current page, first, last, and pages around current
+                        const shouldShowPage = 
+                          pageNumber === 1 || 
+                          pageNumber === totalPages ||
+                          Math.abs(pageNumber - currentPage) <= 1;
+                        
+                        if (!shouldShowPage) {
+                          // Show ellipsis for gaps
+                          if (pageNumber === 2 || pageNumber === totalPages - 1) {
+                            return (
+                              <PaginationItem key={pageNumber}>
+                                <span className="px-2">...</span>
+                              </PaginationItem>
+                            );
+                          }
+                          return null;
+                        }
+                        
+                        return (
+                          <PaginationItem key={pageNumber}>
+                            <PaginationLink
+                              isActive={pageNumber === currentPage}
+                              onClick={() => handlePageChange(pageNumber)}
+                            >
+                              {pageNumber}
+                            </PaginationLink>
+                          </PaginationItem>
+                        );
+                      })}
+                      
+                      {currentPage < totalPages && (
+                        <PaginationItem>
+                          <PaginationNext onClick={() => handlePageChange(currentPage + 1)} />
+                        </PaginationItem>
+                      )}
+                    </PaginationContent>
+                  </Pagination>
+                )}
+              </>
             )}
           </div>
         </div>

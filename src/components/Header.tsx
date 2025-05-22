@@ -79,7 +79,7 @@ const Header = () => {
         <Button
           variant="outline"
           size="sm"
-          className="border-tennis-green text-tennis-green hover:bg-tennis-green hover:text-white text-xs h-7"
+          className="border-tennis-green text-tennis-green hover:bg-tennis-green hover:text-white text-xs h-7 relative z-50"
           onClick={() => setShowSignup(true)}
         >
           List your classes with us
