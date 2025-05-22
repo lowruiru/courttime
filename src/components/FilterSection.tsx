@@ -21,6 +21,8 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Badge } from "@/components/ui/badge";
 import { CheckIcon, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 interface FilterSectionProps {
   onFilterChange: (filters: FilterOptions) => void;
@@ -171,8 +173,8 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
           </div>
         </div>
 
-        {/* Time Range - Improved UX with 24h format */}
-        <div className={`space-y-1 ${isMobile ? '' : 'col-span-3'}`}>
+        {/* Time Range - Made same width as Budget */}
+        <div className={`space-y-1 ${isMobile ? '' : 'col-span-2'}`}>
           <Label htmlFor="timeRange" className="text-xs">Time: {formatTime(filters.timeRange[0])} - {formatTime(filters.timeRange[1])}</Label>
           <Slider
             id="timeRange"
@@ -275,8 +277,8 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
           </Select>
         </div>
 
-        {/* Budget - Moved next to Level */}
-        <div className={`space-y-1 ${isMobile ? 'mb-2' : 'col-span-2'}`}>
+        {/* Budget - Made same width as Time */}
+        <div className={`space-y-1 ${isMobile ? '' : 'col-span-2'}`}>
           <Label htmlFor="budget" className="text-xs">Budget: S${filters.budget}</Label>
           <Slider
             id="budget"
@@ -289,8 +291,20 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
           />
         </div>
         
-        {/* Action Buttons - Moved to the bottom and made the same size */}
-        <div className={`flex gap-2 ${isMobile ? 'w-full mt-1' : 'col-span-3'}`}>
+        {/* Search Bar + Action Buttons - Moved to the bottom and made the same size */}
+        <div className={`flex gap-2 ${isMobile ? 'w-full mt-1' : 'col-span-2'}`}>
+          <div className="relative flex-1">
+            <Input
+              placeholder="Search instructor..."
+              value={filters.instructorName || ""}
+              onChange={(e) => handleFilterChange("instructorName", e.target.value)}
+              className="h-8 text-xs pl-8"
+            />
+            <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
+          </div>
+        </div>
+        
+        <div className={`flex gap-2 ${isMobile ? 'w-full' : 'col-span-2'}`}>
           <Button 
             variant="outline" 
             size="sm" 

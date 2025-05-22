@@ -3,14 +3,12 @@ import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import FilterSection from "@/components/FilterSection";
 import InstructorCard from "@/components/InstructorCard";
-import { Instructor, FilterOptions, TimeSlot } from "@/types/instructor";
+import { Instructor, FilterOptions, TimeSlot, Specializations } from "@/types/instructor";
 import { instructors } from "@/data/instructors";
 import { isSameDay } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
 import { 
   Pagination, 
   PaginationContent, 
@@ -42,7 +40,6 @@ const SearchPage = () => {
   const [filteredResults, setFilteredResults] = useState<{ instructor: Instructor, timeSlot: TimeSlot }[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [noResults, setNoResults] = useState<boolean>(false);
-  const [instructorNameFilter, setInstructorNameFilter] = useState<string>("");
   const [sortOptions, setSortOptions] = useState({
     time: { active: true, direction: "asc" as "asc" | "desc" }, // Set default to earliest first
     price: { active: false, direction: "asc" as "asc" | "desc" }
@@ -59,6 +56,17 @@ const SearchPage = () => {
     currentPage * RESULTS_PER_PAGE
   );
   
+  // Assign specializations to instructors if missing
+  useEffect(() => {
+    // Modify instructors data to add missing specializations
+    instructors.forEach(instructor => {
+      if (!instructor.specialization) {
+        const randomIndex = Math.floor(Math.random() * Specializations.length);
+        instructor.specialization = Specializations[randomIndex];
+      }
+    });
+  }, []);
+
   // Apply filters to instructors and their availability
   useEffect(() => {
     setIsLoading(true);
@@ -75,7 +83,7 @@ const SearchPage = () => {
       
       instructors.forEach(instructor => {
         // Filter by name if specified
-        if (instructorNameFilter && !instructor.name.toLowerCase().includes(instructorNameFilter.toLowerCase())) return;
+        if (filters.instructorName && !instructor.name.toLowerCase().includes(filters.instructorName.toLowerCase())) return;
         
         // Filter by budget
         if (instructor.fee > filters.budget) return;
@@ -121,10 +129,15 @@ const SearchPage = () => {
             instructorsAddedForDate.add(instructor.id);
           }
           
-          // Add the instructor with their available slot(s)
-          availableSlots.forEach(slot => {
-            results.push({ instructor, timeSlot: slot });
-          });
+          // For date filtering, just add the first available slot to show different instructors
+          if (filters.date) {
+            results.push({ instructor, timeSlot: availableSlots[0] });
+          } else {
+            // When not filtering by date, add all slots
+            availableSlots.forEach(slot => {
+              results.push({ instructor, timeSlot: slot });
+            });
+          }
         }
       });
       
@@ -161,12 +174,16 @@ const SearchPage = () => {
       
       // Always ensure we show at least one result no matter what
       if (sortedResults.length === 0) {
-        // If no results, add at least one default result
-        for (const instructor of instructors) {
+        // If no results, try to add a default result without filters
+        const availableInstructors = instructors.filter(instructor => 
+          instructor.availability.some(slot => !slot.booked)
+        );
+        
+        if (availableInstructors.length > 0) {
+          const instructor = availableInstructors[0];
           const availableSlot = instructor.availability.find(slot => !slot.booked);
           if (availableSlot) {
             sortedResults.push({ instructor, timeSlot: availableSlot });
-            break;
           }
         }
       }
@@ -177,7 +194,7 @@ const SearchPage = () => {
     }, 500);
     
     return () => clearTimeout(timer);
-  }, [filters, sortOptions, instructorNameFilter]);
+  }, [filters, sortOptions]);
   
   const handleFilterChange = (newFilters: FilterOptions) => {
     setFilters(newFilters);
@@ -223,7 +240,7 @@ const SearchPage = () => {
             />
           </div>
           
-          {/* Sort Controls with Toggles - Moved Instructor Name Filter */}
+          {/* Sort Controls with Toggles */}
           <div className="bg-white rounded-lg shadow-md px-3 py-2 mb-0 flex justify-between items-center">
             <div className="flex items-center gap-3">
               <h2 className={`text-sm font-semibold whitespace-nowrap ${isMobile ? 'hidden' : 'block'}`}>
@@ -232,17 +249,6 @@ const SearchPage = () => {
                   : "Available Instructors"
                 }
               </h2>
-              
-              {/* Instructor name filter - moved next to "Available Instructors" */}
-              <div className="relative">
-                <Input
-                  placeholder="Search instructor..."
-                  value={instructorNameFilter}
-                  onChange={(e) => setInstructorNameFilter(e.target.value)}
-                  className="h-7 text-xs w-40 pl-8"
-                />
-                <Search className="absolute left-2 top-1.5 h-4 w-4 text-muted-foreground" />
-              </div>
             </div>
             
             <div className="flex gap-2 items-center">
