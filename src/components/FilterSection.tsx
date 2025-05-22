@@ -20,6 +20,7 @@ import { FilterOptions, Levels, NeighborhoodsByRegion, AllNeighborhoods } from "
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
 import { CheckIcon, X } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FilterSectionProps {
   onFilterChange: (filters: FilterOptions) => void;
@@ -29,6 +30,7 @@ interface FilterSectionProps {
 const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) => {
   const [filters, setFilters] = useState<FilterOptions>(activeFilters);
   const [locationCommandOpen, setLocationCommandOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   // Effect to apply filter changes automatically
   useEffect(() => {
@@ -119,9 +121,9 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
         </div>
       </div>
       
-      <div className="grid grid-cols-12 gap-2 items-center">
+      <div className={`grid ${isMobile ? 'grid-cols-1 gap-3' : 'grid-cols-12 gap-2'} items-center`}>
         {/* Date Selection */}
-        <div className="space-y-1 col-span-2">
+        <div className={`space-y-1 ${isMobile ? '' : 'col-span-2'}`}>
           <Label htmlFor="date" className="text-xs">Date</Label>
           <div className="flex h-8 space-x-1">
             <Button
@@ -170,7 +172,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
         </div>
 
         {/* Time Range - Improved UX with 24h format */}
-        <div className="space-y-1 col-span-3">
+        <div className={`space-y-1 ${isMobile ? '' : 'col-span-3'}`}>
           <Label htmlFor="timeRange" className="text-xs">Time: {formatTime(filters.timeRange[0])} - {formatTime(filters.timeRange[1])}</Label>
           <Slider
             id="timeRange"
@@ -184,7 +186,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
         </div>
         
         {/* Location */}
-        <div className="space-y-1 col-span-2">
+        <div className={`space-y-1 ${isMobile ? '' : 'col-span-2'}`}>
           <Label htmlFor="location" className="text-xs">Location</Label>
           <Popover open={locationCommandOpen} onOpenChange={setLocationCommandOpen}>
             <PopoverTrigger asChild>
@@ -253,7 +255,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
         </div>
         
         {/* Level */}
-        <div className="space-y-1 col-span-2">
+        <div className={`space-y-1 ${isMobile ? '' : 'col-span-2'}`}>
           <Label htmlFor="level" className="text-xs">Level</Label>
           <Select
             value={filters.level}
@@ -274,7 +276,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
         </div>
 
         {/* Budget - Moved next to Level */}
-        <div className="space-y-1 col-span-2">
+        <div className={`space-y-1 ${isMobile ? 'mb-2' : 'col-span-2'}`}>
           <Label htmlFor="budget" className="text-xs">Budget: S${filters.budget}</Label>
           <Slider
             id="budget"
@@ -287,14 +289,21 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
           />
         </div>
         
-        {/* Action Buttons - Moved to the same row */}
-        <div className="col-span-1">
-          <Label className="text-xs opacity-0">Actions</Label>
-          <Button variant="outline" size="sm" onClick={resetFilters} className="h-8 text-xs w-full">Reset</Button>
-        </div>
-        <div className="col-span-2">
-          <Label className="text-xs opacity-0">Actions</Label>
-          <Button size="sm" className="bg-tennis-green hover:bg-tennis-green/90 h-8 text-xs w-full" onClick={applyFilters}>
+        {/* Action Buttons - Moved to the bottom and made the same size */}
+        <div className={`flex gap-2 ${isMobile ? 'w-full mt-1' : 'col-span-3'}`}>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={resetFilters} 
+            className="h-8 text-xs flex-1"
+          >
+            Reset
+          </Button>
+          <Button 
+            size="sm" 
+            className="bg-tennis-green hover:bg-tennis-green/90 h-8 text-xs flex-1" 
+            onClick={applyFilters}
+          >
             Search
           </Button>
         </div>

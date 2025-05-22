@@ -66,3 +66,12 @@ export const Levels = [
   "Beginner",
   "Intermediate"
 ];
+
+// Add specialization options
+export const Specializations = [
+  "Techniques",
+  "Footwork",
+  "Strength",
+  "Endurance",
+  "Strategy"
+];

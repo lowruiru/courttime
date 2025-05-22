@@ -19,6 +19,7 @@ import {
   PaginationNext, 
   PaginationPrevious 
 } from "@/components/ui/pagination";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const RESULTS_PER_PAGE = 5;
 
@@ -46,6 +47,7 @@ const SearchPage = () => {
     time: { active: true, direction: "asc" as "asc" | "desc" }, // Set default to earliest first
     price: { active: false, direction: "asc" as "asc" | "desc" }
   });
+  const isMobile = useIsMobile();
   
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -66,6 +68,10 @@ const SearchPage = () => {
     // Simulate API delay for realistic UX
     const timer = setTimeout(() => {
       const results: { instructor: Instructor, timeSlot: TimeSlot }[] = [];
+      
+      // Create a set to track instructors already added for a specific date
+      // This ensures we display different instructors for each date filter
+      const instructorsAddedForDate = new Set<string>();
       
       instructors.forEach(instructor => {
         // Filter by name if specified
@@ -102,13 +108,27 @@ const SearchPage = () => {
           return startHour >= filters.timeRange[0] && startHour <= filters.timeRange[1];
         });
         
+        // Only add this instructor if we haven't already added them for this date
+        // (if a date filter is applied)
+        if (filters.date && instructorsAddedForDate.has(instructor.id)) {
+          return;
+        }
+        
         // Add instructor with each available time slot
-        availableSlots.forEach(slot => {
-          results.push({ instructor, timeSlot: slot });
-        });
+        if (availableSlots.length > 0) {
+          // If there's a date filter, mark this instructor as added
+          if (filters.date) {
+            instructorsAddedForDate.add(instructor.id);
+          }
+          
+          // Add the instructor with their available slot(s)
+          availableSlots.forEach(slot => {
+            results.push({ instructor, timeSlot: slot });
+          });
+        }
       });
       
-      // Apply multi-criteria sorting - ensure time sorting is always primary and defaults to earliest first
+      // Apply multi-criteria sorting - ensure time sorting is always primary
       let sortedResults = [...results];
       
       // Apply sorting with time as the primary sort (always active)
@@ -141,7 +161,7 @@ const SearchPage = () => {
       
       // Always ensure we show at least one result no matter what
       if (sortedResults.length === 0) {
-        // If no results, add at least one default result by finding the first available instructor slot
+        // If no results, add at least one default result
         for (const instructor of instructors) {
           const availableSlot = instructor.availability.find(slot => !slot.booked);
           if (availableSlot) {
@@ -194,7 +214,7 @@ const SearchPage = () => {
       
       <div className="container mx-auto px-4">
         {/* Fixed Filter Sections with higher z-index */}
-        <div className="sticky top-[48px] z-10 bg-gray-50 pt-2 pb-1">
+        <div className={`sticky top-[48px] z-10 bg-gray-50 pt-2 pb-1`}>
           {/* Lower the z-index from 40 to 10 so it doesn't cover the signup modal */}
           <div className="bg-white rounded-lg shadow-md p-3 mb-2">
             <FilterSection 
@@ -206,7 +226,7 @@ const SearchPage = () => {
           {/* Sort Controls with Toggles - Moved Instructor Name Filter */}
           <div className="bg-white rounded-lg shadow-md px-3 py-2 mb-0 flex justify-between items-center">
             <div className="flex items-center gap-3">
-              <h2 className="text-sm font-semibold whitespace-nowrap">
+              <h2 className={`text-sm font-semibold whitespace-nowrap ${isMobile ? 'hidden' : 'block'}`}>
                 {isLoading 
                   ? "Searching for instructors..." 
                   : "Available Instructors"
@@ -226,7 +246,7 @@ const SearchPage = () => {
             </div>
             
             <div className="flex gap-2 items-center">
-              <span className="text-xs text-muted-foreground">Sort by:</span>
+              <span className={`text-xs text-muted-foreground ${isMobile ? 'hidden' : 'block'}`}>Sort by:</span>
               <ToggleGroup type="multiple">
                 <ToggleGroupItem 
                   value="time" 

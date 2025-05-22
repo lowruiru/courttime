@@ -9,11 +9,13 @@ import { format, parse, addDays, isSameDay } from "date-fns";
 import { Calendar, CheckCircle, Clock, MessageCircle, ArrowLeft, MapPin } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { TimeSlot } from '@/types/instructor';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const InstructorDetail = () => {
   const { id } = useParams();
   const instructor = instructors.find(i => i.id === id);
   const [groupedAvailability, setGroupedAvailability] = useState<Record<string, TimeSlot[]>>({});
+  const isMobile = useIsMobile();
   
   useEffect(() => {
     if (!instructor) {
@@ -102,14 +104,14 @@ const InstructorDetail = () => {
           Back to results
         </Link>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className={`grid grid-cols-1 ${isMobile ? '' : 'lg:grid-cols-3'} gap-8`}>
           {/* Instructor Profile */}
-          <div className="lg:col-span-2">
+          <div className={`${isMobile ? '' : 'lg:col-span-2'}`}>
             <Card>
               <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row gap-6">
+                <div className={`flex flex-col ${isMobile ? '' : 'md:flex-row'} gap-6`}>
                   {/* Instructor Image */}
-                  <div className="md:w-1/3">
+                  <div className={`${isMobile ? '' : 'md:w-1/3'}`}>
                     <img 
                       src={instructor.image} 
                       alt={instructor.name} 
@@ -118,8 +120,8 @@ const InstructorDetail = () => {
                   </div>
                   
                   {/* Instructor Details */}
-                  <div className="md:w-2/3">
-                    <div className="flex flex-col md:flex-row justify-between">
+                  <div className={`${isMobile ? '' : 'md:w-2/3'}`}>
+                    <div className={`flex flex-col ${isMobile ? '' : 'md:flex-row'} justify-between`}>
                       <div>
                         <h1 className="text-2xl font-semibold">{instructor.name}</h1>
                         <div className="flex items-center gap-2 mt-1">
@@ -136,7 +138,7 @@ const InstructorDetail = () => {
                           </span>
                         </div>
                       </div>
-                      <div className="mt-2 md:mt-0">
+                      <div className={`${isMobile ? 'mt-2' : 'mt-0'}`}>
                         <p className="text-xl font-semibold text-tennis-green">S${instructor.fee}/hr</p>
                       </div>
                     </div>
@@ -164,7 +166,7 @@ const InstructorDetail = () => {
                         </div>
                       </div>
                       
-                      {/* Added Specialization */}
+                      {/* Updated Specialization with new values */}
                       <div>
                         <h3 className="font-medium">Specialization</h3>
                         <p>{instructor.specialization || "General tennis"}</p>
@@ -225,7 +227,7 @@ const InstructorDetail = () => {
                             </div>
                             
                             <div className="p-3">
-                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                              <div className={`grid grid-cols-1 ${isMobile ? '' : 'md:grid-cols-2 lg:grid-cols-3'} gap-3`}>
                                 {slots.map(slot => {
                                   const whatsappMessage = `Hi ${instructor.name}, I'm interested in booking a tennis lesson with you on ${formattedDate} at ${slot.startTime}.`;
                                   
@@ -274,7 +276,7 @@ const InstructorDetail = () => {
           </div>
           
           {/* Sidebar - Reviews and Ratings */}
-          <div className="lg:col-span-1">
+          <div>
             <Card>
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-4">Reviews & Ratings</h2>

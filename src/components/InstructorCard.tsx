@@ -5,6 +5,7 @@ import { Instructor, TimeSlot } from "@/types/instructor";
 import { Calendar, Clock, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format, parse } from "date-fns";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface InstructorCardProps {
   instructor: Instructor;
@@ -16,13 +17,14 @@ const InstructorCard = ({ instructor, timeSlot }: InstructorCardProps) => {
   const formattedDate = format(date, "EEE, MMM d, yyyy");
   const whatsappMessage = `Hi ${instructor.name}, I'm interested in booking a tennis lesson with you on ${formattedDate} at ${timeSlot.startTime}.`;
   const whatsappLink = `https://wa.me/${instructor.phone}?text=${encodeURIComponent(whatsappMessage)}`;
+  const isMobile = useIsMobile();
   
   return (
     <Card className="mb-4 overflow-hidden transition-shadow hover:shadow-md">
       <CardContent className="p-0">
-        <div className="flex flex-col md:flex-row">
+        <div className={`flex ${isMobile ? "flex-col" : "flex-row"}`}>
           {/* Time Slot (Left Column) */}
-          <div className="md:w-1/5 bg-gray-50 p-4 flex flex-col justify-center items-center">
+          <div className={`${isMobile ? "w-full" : "md:w-1/5"} bg-gray-50 p-4 flex flex-col justify-center items-center`}>
             <Clock className="h-5 w-5 mb-1 text-tennis-green" />
             <p className="text-lg font-bold text-tennis-green">{timeSlot.startTime}</p>
             <p className="text-sm text-muted-foreground">to {timeSlot.endTime}</p>
@@ -34,7 +36,7 @@ const InstructorCard = ({ instructor, timeSlot }: InstructorCardProps) => {
           
           {/* Instructor Details */}
           <div className="flex-1 p-4">
-            <div className="flex flex-col md:flex-row justify-between">
+            <div className={`flex ${isMobile ? "flex-col" : "flex-row"} justify-between`}>
               <div>
                 <h3 className="text-lg font-semibold">{instructor.name}</h3>
                 <div className="flex items-center gap-1 mt-1">
@@ -48,8 +50,8 @@ const InstructorCard = ({ instructor, timeSlot }: InstructorCardProps) => {
                   <span className="text-sm font-medium">{instructor.rating.toFixed(1)}</span>
                 </div>
               </div>
-              <div className="text-right mt-2 md:mt-0">
-                <div className="flex flex-col items-end">
+              <div className={`${isMobile ? "mt-2" : "text-right mt-0"}`}>
+                <div className={`flex ${isMobile ? "flex-row justify-between" : "flex-col items-end"}`}>
                   <p className="font-semibold text-tennis-green">S${instructor.fee}/hr</p>
                   <p className="text-sm text-muted-foreground">
                     {instructor.providesOwnCourt ? "Provides court" : "Requires your court"}
@@ -57,7 +59,7 @@ const InstructorCard = ({ instructor, timeSlot }: InstructorCardProps) => {
                 </div>
                 
                 {/* Action Buttons */}
-                <div className="flex gap-2 mt-2">
+                <div className={`flex gap-2 mt-2 ${isMobile ? "justify-between" : ""}`}>
                   <Button 
                     className="bg-tennis-green hover:bg-tennis-green/90 py-1 px-3 h-auto text-xs"
                     asChild
