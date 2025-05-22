@@ -164,16 +164,13 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
           </div>
         </div>
 
-        {/* Time Range - Updated with two adjustment circles */}
+        {/* Time Range - Updated with improved UX */}
         <div className="space-y-1 col-span-1">
-          <Label htmlFor="timeRange" className="text-xs">
-            {filters.timeRange[0].toString().padStart(2, '0')}:00-{filters.timeRange[1].toString().padStart(2, '0')}:00
+          <Label htmlFor="timeRange" className="text-xs flex justify-between">
+            <span>Start: {filters.timeRange[0].toString().padStart(2, '0')}:00</span>
+            <span>End: {filters.timeRange[1].toString().padStart(2, '0')}:00</span>
           </Label>
           <div className="flex items-center">
-            {/* Start time adjustment circle */}
-            <div className="h-5 w-5 rounded-full border border-primary bg-background flex items-center justify-center mr-1">
-              <div className="h-2 w-2 rounded-full bg-primary"></div>
-            </div>
             <Slider
               id="timeRange"
               value={filters.timeRange}
@@ -183,10 +180,6 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
               onValueChange={(value) => handleFilterChange("timeRange", value)}
               className="py-2 w-full"
             />
-            {/* End time adjustment circle */}
-            <div className="h-5 w-5 rounded-full border border-primary bg-background flex items-center justify-center ml-1">
-              <div className="h-2 w-2 rounded-full bg-primary"></div>
-            </div>
           </div>
         </div>
 
@@ -281,12 +274,9 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
         </div>
 
         {/* Budget filter - now same length as time range */}
-        <div className="space-y-1 col-span-2">
+        <div className="space-y-1 col-span-1">
           <Label htmlFor="budget" className="text-xs">Budget: S${filters.budget}</Label>
           <div className="flex items-center">
-            <div className="h-5 w-5 invisible">
-              {/* Placeholder for symmetry */}
-            </div>
             <Slider
               id="budget"
               value={[filters.budget]}
@@ -296,19 +286,19 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
               onValueChange={(value) => handleFilterChange("budget", value[0])}
               className="w-full py-2"
             />
-            <div className="h-5 w-5 invisible">
-              {/* Placeholder for symmetry */}
-            </div>
           </div>
         </div>
-      </div>
-      
-      {/* Filter Action Buttons - Moved to the same row */}
-      <div className="flex justify-end gap-3 mt-3">
-        <Button variant="outline" size="sm" onClick={resetFilters} className="h-7 text-xs">Reset</Button>
-        <Button size="sm" className="bg-tennis-green hover:bg-tennis-green/90 h-7 text-xs" onClick={applyFilters}>
-          Search Instructors
-        </Button>
+        
+        {/* Action Buttons - Moved to the same row */}
+        <div className="space-y-1 col-span-1">
+          <Label className="text-xs invisible">Actions</Label> {/* Invisible label to align with other fields */}
+          <div className="flex gap-2 h-8">
+            <Button variant="outline" size="sm" onClick={resetFilters} className="h-8 text-xs">Reset</Button>
+            <Button size="sm" className="bg-tennis-green hover:bg-tennis-green/90 h-8 text-xs" onClick={applyFilters}>
+              Search
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
