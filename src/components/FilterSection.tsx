@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -31,6 +31,16 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
   const [filters, setFilters] = useState<FilterOptions>(activeFilters);
   const [locationCommandOpen, setLocationCommandOpen] = useState(false);
 
+  // Effect to apply filter changes automatically
+  useEffect(() => {
+    // Debounce to avoid too many updates
+    const timer = setTimeout(() => {
+      onFilterChange(filters);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [filters, onFilterChange]);
+
   const handleFilterChange = (key: keyof FilterOptions, value: any) => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
@@ -51,7 +61,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
       level: "",
       needsCourt: false,
       date: today,
-      timeRange: [7, 22]
+      timeRange: [6, 22]  // Changed to start at 06:00 and end at 22:00
     };
     setFilters(defaultFilters);
     onFilterChange(defaultFilters);
@@ -92,7 +102,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
     <div>
       <div className="flex justify-between items-center mb-3">
         <div className="flex items-center space-x-4">
-          <h2 className="text-base font-semibold">Find Your Tennis Instructor</h2>
+          <h2 className="text-base font-semibold">Find a Tennis Instructor</h2>
           <div className="flex items-center gap-2">
             <Switch
               id="needsCourt"
@@ -100,12 +110,12 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
               onCheckedChange={(checked) => handleFilterChange("needsCourt", checked)}
               className="h-4"
             />
-            <Label htmlFor="needsCourt" className="text-xs">Needs Court</Label>
+            <Label htmlFor="needsCourt" className="text-xs">I need a court</Label>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="space-y-1">
-            <Label htmlFor="budget" className="text-xs">Budget: S${filters.budget}</Label>
+          
+          {/* Budget filter moved here */}
+          <div className="space-y-0 flex items-center gap-2">
+            <Label htmlFor="budget" className="text-xs whitespace-nowrap">Budget: S${filters.budget}</Label>
             <Slider
               id="budget"
               value={[filters.budget]}
@@ -113,13 +123,13 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
               max={200}
               step={10}
               onValueChange={(value) => handleFilterChange("budget", value[0])}
-              className="w-36"
+              className="w-28"
             />
           </div>
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
         {/* 1. Search by Instructor Name */}
         <div className="space-y-1">
           <Label htmlFor="instructorName" className="text-xs">Instructor Name</Label>
@@ -192,8 +202,8 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
           <Slider
             id="timeRange"
             value={filters.timeRange}
-            min={0}
-            max={23}
+            min={6}  // Changed to start at 06:00
+            max={22}  // End at 22:00
             step={1}
             onValueChange={(value) => handleFilterChange("timeRange", value)}
             className="py-2"

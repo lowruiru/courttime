@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import FilterSection from "@/components/FilterSection";
@@ -21,7 +20,7 @@ const SearchPage = () => {
     level: "",
     needsCourt: false,
     date: today,
-    timeRange: [7, 22]
+    timeRange: [6, 22] // Changed to start at 06:00 and end at 22:00
   };
   
   const [filters, setFilters] = useState<FilterOptions>(defaultFilters);
