@@ -9,18 +9,18 @@ import { isSameDay } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 const SearchPage = () => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
+  // Remove today as default date
   const defaultFilters: FilterOptions = {
     instructorName: "",
     location: [],
     budget: 200,
     level: "",
     needsCourt: false,
-    date: today,
+    date: undefined, // Remove default date
     timeRange: [6, 22]
   };
   
@@ -28,6 +28,7 @@ const SearchPage = () => {
   const [filteredResults, setFilteredResults] = useState<{ instructor: Instructor, timeSlot: TimeSlot }[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [noResults, setNoResults] = useState<boolean>(false);
+  const [instructorNameFilter, setInstructorNameFilter] = useState<string>("");
   const [sortOptions, setSortOptions] = useState({
     time: { active: true, direction: "asc" as "asc" | "desc" },
     price: { active: false, direction: "asc" as "asc" | "desc" }
@@ -44,7 +45,7 @@ const SearchPage = () => {
       
       instructors.forEach(instructor => {
         // Filter by name if specified
-        if (filters.instructorName && !instructor.name.toLowerCase().includes(filters.instructorName.toLowerCase())) return;
+        if (instructorNameFilter && !instructor.name.toLowerCase().includes(instructorNameFilter.toLowerCase())) return;
         
         // Filter by budget
         if (instructor.fee > filters.budget) return;
@@ -116,7 +117,7 @@ const SearchPage = () => {
     }, 500);
     
     return () => clearTimeout(timer);
-  }, [filters, sortOptions]);
+  }, [filters, sortOptions, instructorNameFilter]);
   
   const handleFilterChange = (newFilters: FilterOptions) => {
     setFilters(newFilters);
@@ -152,14 +153,27 @@ const SearchPage = () => {
             />
           </div>
           
-          {/* Sort Controls with Toggles */}
+          {/* Sort Controls with Toggles - Add Instructor Name Filter */}
           <div className="bg-white rounded-lg shadow-md px-3 py-2 mb-0 flex justify-between items-center">
-            <h2 className="text-sm font-semibold">
-              {isLoading 
-                ? "Searching for instructors..." 
-                : `Available Instructors ${filteredResults.length > 0 ? `(${filteredResults.length})` : ''}`
-              }
-            </h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-semibold">
+                {isLoading 
+                  ? "Searching for instructors..." 
+                  : `Available Instructors ${filteredResults.length > 0 ? `(${filteredResults.length})` : ''}`
+                }
+              </h2>
+              
+              {/* Add instructor name filter here */}
+              <div className="relative">
+                <Input
+                  placeholder="Search instructor..."
+                  value={instructorNameFilter}
+                  onChange={(e) => setInstructorNameFilter(e.target.value)}
+                  className="h-7 text-xs w-40 pl-8"
+                />
+                <Search className="absolute left-2 top-1.5 h-4 w-4 text-muted-foreground" />
+              </div>
+            </div>
             
             <div className="flex gap-2 items-center">
               <span className="text-xs text-muted-foreground">Sort by:</span>

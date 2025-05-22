@@ -56,7 +56,7 @@ const InstructorCard = ({ instructor, timeSlot }: InstructorCardProps) => {
                   </p>
                 </div>
                 
-                {/* Action Buttons - Moved up next to price */}
+                {/* Action Buttons - Update button text */}
                 <div className="flex gap-2 mt-2">
                   <Button 
                     className="bg-tennis-green hover:bg-tennis-green/90 py-1 px-3 h-auto text-xs"
@@ -64,7 +64,7 @@ const InstructorCard = ({ instructor, timeSlot }: InstructorCardProps) => {
                   >
                     <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
                       <MessageCircle className="mr-1 h-3 w-3" />
-                      Contact
+                      Book this slot
                     </a>
                   </Button>
                   <Button 

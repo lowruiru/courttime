@@ -5,19 +5,52 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import Header from '@/components/Header';
 import { instructors } from '@/data/instructors';
-import { format, parse } from "date-fns";
+import { format, parse, addDays, isSameDay } from "date-fns";
 import { Calendar, CheckCircle, Clock, MessageCircle, ArrowLeft, MapPin } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { TimeSlot } from '@/types/instructor';
 
 const InstructorDetail = () => {
   const { id } = useParams();
   const instructor = instructors.find(i => i.id === id);
+  const [groupedAvailability, setGroupedAvailability] = useState<Record<string, TimeSlot[]>>({});
   
-  // Handle if instructor not found
   useEffect(() => {
     if (!instructor) {
       console.error(`Instructor with ID ${id} not found`);
+      return;
     }
+    
+    // Group availability by date
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const oneWeekLater = addDays(today, 7);
+    
+    // Filter slots to only include available slots for the next week
+    const availableSlots = instructor.availability.filter(slot => {
+      if (slot.booked) return false;
+      
+      const slotDate = parse(slot.date, "yyyy-MM-dd", new Date());
+      return slotDate >= today && slotDate <= oneWeekLater;
+    });
+    
+    // Group by date
+    const groupedByDate: Record<string, TimeSlot[]> = {};
+    
+    availableSlots.forEach(slot => {
+      if (!groupedByDate[slot.date]) {
+        groupedByDate[slot.date] = [];
+      }
+      groupedByDate[slot.date].push(slot);
+    });
+    
+    // Sort time slots within each date
+    Object.keys(groupedByDate).forEach(date => {
+      groupedByDate[date].sort((a, b) => a.startTime.localeCompare(b.startTime));
+    });
+    
+    setGroupedAvailability(groupedByDate);
     
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
@@ -151,60 +184,66 @@ const InstructorDetail = () => {
                   <p>{instructor.bio}</p>
                 </div>
                 
-                {/* Availability Section */}
+                {/* Availability Section - Reformatted to group by date */}
                 <div className="mt-8">
                   <h2 className="text-xl font-semibold mb-4">Upcoming Availability</h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {instructor.availability
-                      .filter(slot => !slot.booked)
-                      .slice(0, 9)
-                      .map((slot) => {
-                        const date = parse(slot.date, "yyyy-MM-dd", new Date());
-                        const formattedDate = format(date, "EEE, MMM d, yyyy");
-                        const whatsappMessage = `Hi ${instructor.name}, I'm interested in booking a tennis lesson with you on ${formattedDate} at ${slot.startTime}.`;
+                  
+                  {Object.keys(groupedAvailability).length > 0 ? (
+                    <div className="grid grid-cols-1 gap-6">
+                      {Object.entries(groupedAvailability).map(([dateString, slots]) => {
+                        const date = parse(dateString, "yyyy-MM-dd", new Date());
+                        const formattedDate = format(date, "EEEE, MMMM d, yyyy");
                         
                         return (
-                          <div 
-                            key={`avail-${slot.id}`}
-                            className="bg-white border rounded-md overflow-hidden hover:shadow-md transition-shadow"
-                          >
-                            <div className="bg-gray-50 p-2 border-b">
-                              <div className="flex items-center gap-2 text-sm font-medium">
-                                <Calendar className="h-4 w-4 text-tennis-green" />
-                                <span>{format(date, "EEE, MMM d")}</span>
-                              </div>
+                          <div key={dateString} className="border rounded-lg overflow-hidden">
+                            <div className="bg-gray-50 p-3 border-b flex items-center">
+                              <Calendar className="h-4 w-4 text-tennis-green mr-2" />
+                              <h3 className="font-medium">{formattedDate}</h3>
                             </div>
-                            <div className="p-3 space-y-2">
-                              <div className="flex items-center gap-2 text-sm">
-                                <Clock className="h-4 w-4 text-muted-foreground" />
-                                <span className="font-medium">{slot.startTime} - {slot.endTime}</span>
+                            
+                            <div className="p-3">
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                {slots.map(slot => {
+                                  const whatsappMessage = `Hi ${instructor.name}, I'm interested in booking a tennis lesson with you on ${formattedDate} at ${slot.startTime}.`;
+                                  
+                                  return (
+                                    <div 
+                                      key={slot.id}
+                                      className="bg-white border rounded-md overflow-hidden hover:shadow-sm transition-shadow"
+                                    >
+                                      <div className="p-3 space-y-2">
+                                        <div className="flex items-center gap-2 text-sm">
+                                          <Clock className="h-4 w-4 text-tennis-green" />
+                                          <span className="font-medium">
+                                            {slot.startTime} - {slot.endTime}
+                                          </span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-sm">
+                                          <MapPin className="h-4 w-4 text-muted-foreground" />
+                                          <span>{slot.location}</span>
+                                        </div>
+                                        <Button 
+                                          className="w-full mt-2 bg-tennis-green hover:bg-tennis-green/90"
+                                          size="sm"
+                                          asChild
+                                        >
+                                          <a href={`https://wa.me/${instructor.phone}?text=${encodeURIComponent(whatsappMessage)}`} target="_blank" rel="noopener noreferrer">
+                                            <MessageCircle className="mr-2 h-3 w-3" />
+                                            Book this slot
+                                          </a>
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
                               </div>
-                              <div className="flex items-center gap-2 text-sm">
-                                <MapPin className="h-4 w-4 text-muted-foreground" />
-                                <span>{slot.location}</span>
-                              </div>
-                              <Button 
-                                className="w-full mt-2 bg-tennis-green hover:bg-tennis-green/90"
-                                size="sm"
-                                asChild
-                              >
-                                <a href={`https://wa.me/${instructor.phone}?text=${encodeURIComponent(whatsappMessage)}`} target="_blank" rel="noopener noreferrer">
-                                  <MessageCircle className="mr-2 h-3 w-3" />
-                                  Book this slot
-                                </a>
-                              </Button>
                             </div>
                           </div>
                         );
                       })}
-                  </div>
-                  
-                  {instructor.availability.filter(slot => !slot.booked).length > 9 && (
-                    <div className="text-center mt-4">
-                      <Button variant="outline" className="text-tennis-green border-tennis-green hover:bg-tennis-green/10">
-                        Show More Availability
-                      </Button>
                     </div>
+                  ) : (
+                    <p>No available slots in the next week.</p>
                   )}
                 </div>
               </CardContent>
