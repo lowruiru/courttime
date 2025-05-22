@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -325,9 +324,11 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
             </SelectContent>
           </Select>
         </div>
-        
-        {/* 6. Budget filter - Moved down next to level */}
-        <div className="space-y-1 col-span-1">
+      </div>
+
+      {/* Budget filter moved to a new row, next to level */}
+      <div className="grid grid-cols-6 gap-2 mt-2">
+        <div className="col-start-5 col-span-2 space-y-1">
           <Label htmlFor="budget" className="text-xs whitespace-nowrap">Budget: S${filters.budget}</Label>
           <Slider
             id="budget"
