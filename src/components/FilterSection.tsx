@@ -209,7 +209,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
               >
                 {filters.location.length > 0
                   ? `${filters.location.length} selected`
-                  : "Select"}
+                  : "Any Location"}
                 <ChevronRight className="ml-1 h-4 w-4 shrink-0 rotate-90 opacity-50" />
               </Button>
             </PopoverTrigger>
@@ -273,7 +273,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
             onValueChange={(value) => handleFilterChange("level", value)}
           >
             <SelectTrigger id="level" className="h-8 text-xs">
-              <SelectValue placeholder="Level" />
+              <SelectValue placeholder="Any level" />
             </SelectTrigger>
             <SelectContent align="start">
               <SelectItem value="all_levels">Any Level</SelectItem>
