@@ -298,12 +298,9 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
             </SelectContent>
           </Select>
         </div>
-<<<<<<< HEAD
-      </div>
-
-      {/* Budget filter moved to a new row, next to level */}
-      <div className="grid grid-cols-6 gap-2 mt-2">
-        <div className="col-start-5 col-span-2 space-y-1">
+        
+        {/* 6. Budget filter - Moved down next to level */}
+        <div className="space-y-1 col-span-1">
           <Label htmlFor="budget" className="text-xs whitespace-nowrap">Budget: S${filters.budget}</Label>
           <Slider
             id="budget"
@@ -315,8 +312,6 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
             className="py-2"
           />
         </div>
-=======
->>>>>>> 2511c55 (Reverted to commit 6fe61e02a47deb4e2735d852312fe2cf4e85c6b6)
       </div>
       
       {/* Filter Action Buttons */}
