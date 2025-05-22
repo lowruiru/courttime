@@ -33,6 +33,7 @@ export interface TimeSlot {
 }
 
 export interface FilterOptions {
+  instructorName?: string;
   location: string[];
   budget: number;
   level: string;

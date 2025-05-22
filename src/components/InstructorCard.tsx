@@ -12,12 +12,10 @@ interface InstructorCardProps {
 }
 
 const InstructorCard = ({ instructor, timeSlot }: InstructorCardProps) => {
-  const whatsappLink = `https://wa.me/${instructor.phone}?text=Hi, I'm interested in booking a tennis lesson with you.`;
-  
-  // Parse the date and time
   const date = parse(timeSlot.date, "yyyy-MM-dd", new Date());
-  const startTime = timeSlot.startTime;
-  const endTime = timeSlot.endTime;
+  const formattedDate = format(date, "EEE, MMM d, yyyy");
+  const whatsappMessage = `Hi ${instructor.name}, I'm interested in booking a tennis lesson with you on ${formattedDate} at ${timeSlot.startTime}.`;
+  const whatsappLink = `https://wa.me/${instructor.phone}?text=${encodeURIComponent(whatsappMessage)}`;
   
   return (
     <Card className="mb-4 overflow-hidden transition-shadow hover:shadow-md">
@@ -26,8 +24,8 @@ const InstructorCard = ({ instructor, timeSlot }: InstructorCardProps) => {
           {/* Time Slot (Left Column) */}
           <div className="md:w-1/5 bg-gray-50 p-4 flex flex-col justify-center items-center">
             <Clock className="h-5 w-5 mb-1 text-tennis-green" />
-            <p className="text-lg font-bold text-tennis-green">{startTime}</p>
-            <p className="text-sm text-muted-foreground">to {endTime}</p>
+            <p className="text-lg font-bold text-tennis-green">{timeSlot.startTime}</p>
+            <p className="text-sm text-muted-foreground">to {timeSlot.endTime}</p>
             <div className="mt-2 text-xs">
               <Calendar className="h-4 w-4 inline mr-1" />
               <span>{format(date, "EEE, MMM d")}</span>
@@ -50,14 +48,16 @@ const InstructorCard = ({ instructor, timeSlot }: InstructorCardProps) => {
                   <span className="text-sm font-medium">{instructor.rating.toFixed(1)}</span>
                 </div>
               </div>
-              <div className="text-right mt-2 md:mt-0 flex flex-col items-end">
-                <p className="font-semibold text-tennis-green">S${instructor.fee}/hr</p>
-                <p className="text-sm text-muted-foreground mb-2">
-                  {instructor.providesOwnCourt ? "Provides court" : "Requires your court"}
-                </p>
+              <div className="text-right mt-2 md:mt-0">
+                <div className="flex flex-col items-end">
+                  <p className="font-semibold text-tennis-green">S${instructor.fee}/hr</p>
+                  <p className="text-sm text-muted-foreground">
+                    {instructor.providesOwnCourt ? "Provides court" : "Requires your court"}
+                  </p>
+                </div>
                 
-                {/* Action Buttons */}
-                <div className="flex gap-2">
+                {/* Action Buttons - Moved up next to price */}
+                <div className="flex gap-2 mt-2">
                   <Button 
                     className="bg-tennis-green hover:bg-tennis-green/90 py-1 px-3 h-auto text-xs"
                     asChild

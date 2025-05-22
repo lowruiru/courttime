@@ -6,7 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import Header from '@/components/Header';
 import { instructors } from '@/data/instructors';
 import { format, parse } from "date-fns";
-import { Calendar, CheckCircle, Clock, MessageCircle, ArrowLeft } from 'lucide-react';
+import { Calendar, CheckCircle, Clock, MessageCircle, ArrowLeft, MapPin } from 'lucide-react';
 import { useEffect } from 'react';
 
 const InstructorDetail = () => {
@@ -41,8 +41,6 @@ const InstructorDetail = () => {
       </div>
     );
   }
-  
-  const whatsappLink = `https://wa.me/${instructor.phone}?text=Hi, I'm interested in booking a tennis lesson with you.`;
 
   return (
     <div>
@@ -138,7 +136,7 @@ const InstructorDetail = () => {
                         className="bg-tennis-green hover:bg-tennis-green/90"
                         asChild
                       >
-                        <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
+                        <a href={`https://wa.me/${instructor.phone}?text=Hi, I'm interested in booking a tennis lesson with you.`} target="_blank" rel="noopener noreferrer">
                           <MessageCircle className="mr-2 h-4 w-4" />
                           Contact Me
                         </a>
@@ -153,47 +151,61 @@ const InstructorDetail = () => {
                   <p>{instructor.bio}</p>
                 </div>
                 
-                {/* Availability Section */}
+                {/* Availability Section - Redesigned */}
                 <div className="mt-8">
-                  <h2 className="text-xl font-semibold mb-3">Upcoming Availability</h2>
-                  <div className="grid gap-3">
+                  <h2 className="text-xl font-semibold mb-4">Upcoming Availability</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {instructor.availability
                       .filter(slot => !slot.booked)
-                      .slice(0, 5)
+                      .slice(0, 9)
                       .map((slot) => {
                         const date = parse(slot.date, "yyyy-MM-dd", new Date());
+                        const formattedDate = format(date, "EEE, MMM d, yyyy");
+                        const whatsappMessage = `Hi ${instructor.name}, I'm interested in booking a tennis lesson with you on ${formattedDate} at ${slot.startTime}.`;
+                        
                         return (
                           <div 
                             key={slot.id}
-                            className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border rounded-md hover:bg-muted/50 transition-colors"
+                            className="bg-white border rounded-md overflow-hidden hover:shadow-md transition-shadow"
                           >
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                              <div className="flex items-center gap-2">
-                                <Calendar className="h-4 w-4 text-muted-foreground" />
-                                <span>{format(date, "EEE, MMMM d, yyyy")}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Clock className="h-4 w-4 text-muted-foreground" />
-                                <span>{slot.startTime} - {slot.endTime}</span>
-                              </div>
-                              <div className="text-sm">
-                                <span className="font-medium">Location:</span> {slot.location}
+                            <div className="bg-gray-50 p-2 border-b">
+                              <div className="flex items-center gap-2 text-sm font-medium">
+                                <Calendar className="h-4 w-4 text-tennis-green" />
+                                <span>{format(date, "EEE, MMM d")}</span>
                               </div>
                             </div>
-                            <Button 
-                              className="mt-3 sm:mt-0 bg-tennis-green hover:bg-tennis-green/90"
-                              size="sm"
-                              asChild
-                            >
-                              <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
-                                <MessageCircle className="mr-2 h-4 w-4" />
-                                Contact
-                              </a>
-                            </Button>
+                            <div className="p-3 space-y-2">
+                              <div className="flex items-center gap-2 text-sm">
+                                <Clock className="h-4 w-4 text-muted-foreground" />
+                                <span className="font-medium">{slot.startTime} - {slot.endTime}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-sm">
+                                <MapPin className="h-4 w-4 text-muted-foreground" />
+                                <span>{slot.location}</span>
+                              </div>
+                              <Button 
+                                className="w-full mt-2 bg-tennis-green hover:bg-tennis-green/90"
+                                size="sm"
+                                asChild
+                              >
+                                <a href={`https://wa.me/${instructor.phone}?text=${encodeURIComponent(whatsappMessage)}`} target="_blank" rel="noopener noreferrer">
+                                  <MessageCircle className="mr-2 h-3 w-3" />
+                                  Book this slot
+                                </a>
+                              </Button>
+                            </div>
                           </div>
                         );
                       })}
                   </div>
+                  
+                  {instructor.availability.filter(slot => !slot.booked).length > 9 && (
+                    <div className="text-center mt-4">
+                      <Button variant="outline" className="text-tennis-green border-tennis-green hover:bg-tennis-green/10">
+                        Show More Availability
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

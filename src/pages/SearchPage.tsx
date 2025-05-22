@@ -14,6 +14,7 @@ const SearchPage = () => {
   today.setHours(0, 0, 0, 0);
   
   const defaultFilters: FilterOptions = {
+    instructorName: "",
     location: [],
     budget: 200,
     level: "",
@@ -39,6 +40,9 @@ const SearchPage = () => {
       const results: { instructor: Instructor, timeSlot: TimeSlot }[] = [];
       
       instructors.forEach(instructor => {
+        // Filter by name if specified
+        if (filters.instructorName && !instructor.name.toLowerCase().includes(filters.instructorName.toLowerCase())) return;
+        
         // Filter by budget
         if (instructor.fee > filters.budget) return;
         
@@ -121,17 +125,9 @@ const SearchPage = () => {
       <Header />
       
       <div className="container mx-auto px-4">
-        {/* Compact Hero Section */}
-        <div className="mb-2 pt-2 text-center">
-          <h1 className="text-xl md:text-2xl font-bold mb-1">Find Tennis Instructors in Singapore</h1>
-          <p className="text-xs text-muted-foreground md:w-2/3 mx-auto">
-            Select your preferred location, time, and budget.
-          </p>
-        </div>
-        
-        {/* Fixed Filter and Date Navigation - Combined and Compact */}
-        <div className="sticky top-[48px] z-40 bg-gray-50 pt-1 pb-2">
-          <div className="bg-white rounded-lg shadow-md p-3 mb-0">
+        {/* Compact Filter Section */}
+        <div className="sticky top-[48px] z-40 bg-gray-50 pt-2 pb-1">
+          <div className="bg-white rounded-lg shadow-md p-3 mb-2">
             <FilterSection 
               onFilterChange={handleFilterChange}
               activeFilters={filters}
@@ -139,7 +135,7 @@ const SearchPage = () => {
           </div>
           
           {/* Sort Controls */}
-          <div className="bg-white rounded-b-lg shadow-md px-3 py-2 mb-3 border-t flex justify-between items-center">
+          <div className="bg-white rounded-lg shadow-md px-3 py-2 mb-3 flex justify-between items-center">
             <h2 className="text-sm font-semibold">
               {isLoading 
                 ? "Searching for instructors..." 
