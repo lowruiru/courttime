@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -112,6 +113,19 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
             <Label htmlFor="needsCourt" className="text-xs">I need a court</Label>
           </div>
           
+          {/* Budget filter */}
+          <div className="space-y-0 flex items-center gap-2">
+            <Label htmlFor="budget" className="text-xs whitespace-nowrap">Budget: S${filters.budget}</Label>
+            <Slider
+              id="budget"
+              value={[filters.budget]}
+              min={30}
+              max={200}
+              step={10}
+              onValueChange={(value) => handleFilterChange("budget", value[0])}
+              className="w-24"
+            />
+          </div>
         </div>
       </div>
       
@@ -209,7 +223,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
               >
                 {filters.location.length > 0
                   ? `${filters.location.length} selected`
-                  : "All Locations"}
+                  : "Select"}
                 <ChevronRight className="ml-1 h-4 w-4 shrink-0 rotate-90 opacity-50" />
               </Button>
             </PopoverTrigger>
@@ -273,10 +287,10 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
             onValueChange={(value) => handleFilterChange("level", value)}
           >
             <SelectTrigger id="level" className="h-8 text-xs">
-              <SelectValue placeholder="All Levels" />
+              <SelectValue placeholder="Level" />
             </SelectTrigger>
             <SelectContent align="start">
-              <SelectItem value="all_levels">All Levels</SelectItem>
+              <SelectItem value="all_levels">Any Level</SelectItem>
               {Levels.map((level) => (
                 <SelectItem key={level} value={level}>
                   {level}
@@ -284,20 +298,6 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
               ))}
             </SelectContent>
           </Select>
-        </div>
-        
-        {/* 6. Budget filter - Moved down next to level */}
-        <div className="space-y-1 col-span-1">
-          <Label htmlFor="budget" className="text-xs whitespace-nowrap">Budget: S${filters.budget}</Label>
-          <Slider
-            id="budget"
-            value={[filters.budget]}
-            min={30}
-            max={200}
-            step={10}
-            onValueChange={(value) => handleFilterChange("budget", value[0])}
-            className="py-2"
-          />
         </div>
       </div>
       
