@@ -273,7 +273,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
             onValueChange={(value) => handleFilterChange("level", value)}
           >
             <SelectTrigger id="level" className="h-8 text-xs">
-              <SelectValue placeholder="Any level" />
+              <SelectValue placeholder="All Levels" />
             </SelectTrigger>
             <SelectContent align="start">
               <SelectItem value="all_levels">All Levels</SelectItem>
