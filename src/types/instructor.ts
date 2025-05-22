@@ -26,8 +26,8 @@ export interface Review {
 export interface TimeSlot {
   id: string;
   date: string; // ISO format
-  startTime: string; // 24h format
-  endTime: string; // 24h format
+  startTime: string; // 24h format with 4 digits (HH:MM)
+  endTime: string; // 24h format with 4 digits (HH:MM)
   location: string;
   booked: boolean;
 }
@@ -40,6 +40,13 @@ export interface FilterOptions {
   needsCourt: boolean;
   date: Date | undefined;
   timeRange: [number, number]; // 24h format, e.g. [8, 21] for 8am to 9pm
+}
+
+// Format time to ensure 4 digits (HH:MM)
+export function formatTimeToHHMM(time: string): string {
+  const [hours, minutes] = time.split(':');
+  const paddedHours = hours.padStart(2, '0');
+  return `${paddedHours}:${minutes}`;
 }
 
 export const NeighborhoodsByRegion = {

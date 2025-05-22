@@ -1,5 +1,4 @@
-
-import { Instructor } from "../types/instructor";
+import { Instructor, formatTimeToHHMM } from "../types/instructor";
 import { addDays, addMonths, format } from "date-fns";
 
 // Helper function to create availability slots through June 2025
@@ -24,11 +23,15 @@ const generateAvailability = (instructorId: string, baseDate: Date, locations: s
         const startHour = Math.floor(Math.random() * 12) + 8; // 8am to 8pm
         const endHour = startHour + 1; // 1 hour sessions
         
+        // Format times with leading zeros for consistent 4-digit format
+        const startTimeFormatted = formatTimeToHHMM(`${startHour}:00`);
+        const endTimeFormatted = formatTimeToHHMM(`${endHour}:00`);
+        
         availability.push({
           id: `${instructorId}-${dateStr}-${startHour}`,
           date: dateStr,
-          startTime: `${startHour}:00`,
-          endTime: `${endHour}:00`,
+          startTime: startTimeFormatted,
+          endTime: endTimeFormatted,
           location: locations[Math.floor(Math.random() * locations.length)],
           booked: Math.random() > 0.8 // 20% chance of being booked
         });
@@ -46,11 +49,79 @@ const generateAvailability = (instructorId: string, baseDate: Date, locations: s
   return availability;
 };
 
+// Ensure there's at least one instructor available for every day until June 2025
+const ensureDailyCoverage = (instructors: Instructor[]) => {
+  // Get today's date at midnight
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  // Calculate end date (June 30, 2025)
+  const endDate = new Date(2025, 5, 30); // Month is 0-based
+  
+  // Create a map to track days with coverage
+  const coveredDays = new Map();
+  
+  // Check current coverage
+  instructors.forEach(instructor => {
+    instructor.availability.forEach(slot => {
+      if (!slot.booked) {
+        coveredDays.set(slot.date, true);
+      }
+    });
+  });
+  
+  // Fill missing dates
+  const currentDate = new Date(today);
+  while (currentDate <= endDate) {
+    const dateStr = format(currentDate, "yyyy-MM-dd");
+    
+    if (!coveredDays.has(dateStr)) {
+      // Add availability for a random instructor
+      const randomInstructorIndex = Math.floor(Math.random() * instructors.length);
+      const instructor = instructors[randomInstructorIndex];
+      
+      // Create 1-3 slots for this date
+      const slotsToAdd = Math.floor(Math.random() * 3) + 1;
+      
+      for (let i = 0; i < slotsToAdd; i++) {
+        const startHour = Math.floor(Math.random() * 12) + 8; // 8am to 8pm
+        const endHour = startHour + 1;
+        
+        // Format times with leading zeros
+        const startTimeFormatted = formatTimeToHHMM(`${startHour}:00`);
+        const endTimeFormatted = formatTimeToHHMM(`${endHour}:00`);
+        
+        instructor.availability.push({
+          id: `${instructor.id}-${dateStr}-${startHour}`,
+          date: dateStr,
+          startTime: startTimeFormatted,
+          endTime: endTimeFormatted,
+          location: instructor.location[Math.floor(Math.random() * instructor.location.length)],
+          booked: false
+        });
+      }
+      
+      // Re-sort this instructor's availability
+      instructor.availability.sort((a, b) => {
+        const dateCompare = a.date.localeCompare(b.date);
+        if (dateCompare !== 0) return dateCompare;
+        return a.startTime.localeCompare(b.startTime);
+      });
+    }
+    
+    // Move to next day
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+  
+  return instructors;
+};
+
 // Get today's date at midnight
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
-export const instructors: Instructor[] = [
+// Create instructors data
+let instructorsData: Instructor[] = [
   {
     id: "1",
     name: "James Wong",
@@ -300,3 +371,8 @@ export const instructors: Instructor[] = [
     availability: generateAvailability("8", today, ["Serangoon", "Kallang"])
   }
 ];
+
+// Ensure at least one instructor available for every day
+instructorsData = ensureDailyCoverage(instructorsData);
+
+export const instructors = instructorsData;

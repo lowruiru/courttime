@@ -8,6 +8,7 @@ import { instructors } from "@/data/instructors";
 import { isSameDay } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { ArrowDown, ArrowUp } from "lucide-react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const SearchPage = () => {
   const today = new Date();
@@ -27,8 +28,10 @@ const SearchPage = () => {
   const [filteredResults, setFilteredResults] = useState<{ instructor: Instructor, timeSlot: TimeSlot }[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [noResults, setNoResults] = useState<boolean>(false);
-  const [sortBy, setSortBy] = useState<"time" | "price">("time");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [sortOptions, setSortOptions] = useState({
+    time: { active: true, direction: "asc" as "asc" | "desc" },
+    price: { active: false, direction: "asc" as "asc" | "desc" }
+  });
   
   // Apply filters to instructors and their availability
   useEffect(() => {
@@ -80,24 +83,32 @@ const SearchPage = () => {
         });
       });
       
-      // Sort results based on current sort settings
+      // Apply multi-criteria sorting
       let sortedResults = [...results];
       
-      if (sortBy === "time") {
-        sortedResults.sort((a, b) => {
+      // Apply sorting based on active sort options
+      sortedResults.sort((a, b) => {
+        // First sort by time if active
+        if (sortOptions.time.active) {
           const aTime = a.timeSlot.startTime;
           const bTime = b.timeSlot.startTime;
-          return sortDirection === "asc" 
+          const timeCompare = sortOptions.time.direction === "asc" 
             ? aTime.localeCompare(bTime)
             : bTime.localeCompare(aTime);
-        });
-      } else if (sortBy === "price") {
-        sortedResults.sort((a, b) => {
-          return sortDirection === "asc"
+          
+          // If times are different or price sorting is not active, return the time comparison
+          if (timeCompare !== 0 || !sortOptions.price.active) return timeCompare;
+        }
+        
+        // Then sort by price if active
+        if (sortOptions.price.active) {
+          return sortOptions.price.direction === "asc"
             ? a.instructor.fee - b.instructor.fee
             : b.instructor.fee - a.instructor.fee;
-        });
-      }
+        }
+        
+        return 0; // Default if no sort criteria are active
+      });
       
       setFilteredResults(sortedResults);
       setNoResults(sortedResults.length === 0);
@@ -105,19 +116,26 @@ const SearchPage = () => {
     }, 500);
     
     return () => clearTimeout(timer);
-  }, [filters, sortBy, sortDirection]);
+  }, [filters, sortOptions]);
   
   const handleFilterChange = (newFilters: FilterOptions) => {
     setFilters(newFilters);
   };
   
   const toggleSort = (type: "time" | "price") => {
-    if (sortBy === type) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortBy(type);
-      setSortDirection("asc");
-    }
+    setSortOptions(prev => {
+      const newOptions = { ...prev };
+      
+      if (prev[type].active) {
+        // Toggle direction if already active
+        newOptions[type].direction = prev[type].direction === "asc" ? "desc" : "asc";
+      } else {
+        // Enable this sort option
+        newOptions[type].active = true;
+      }
+      
+      return newOptions;
+    });
   };
   
   return (
@@ -134,7 +152,7 @@ const SearchPage = () => {
             />
           </div>
           
-          {/* Sort Controls */}
+          {/* Sort Controls with Toggles */}
           <div className="bg-white rounded-lg shadow-md px-3 py-2 mb-3 flex justify-between items-center">
             <h2 className="text-sm font-semibold">
               {isLoading 
@@ -143,27 +161,39 @@ const SearchPage = () => {
               }
             </h2>
             
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                className={`text-xs h-7 ${sortBy === "time" ? "bg-gray-100" : ""}`}
-                onClick={() => toggleSort("time")}
-              >
-                Time {sortBy === "time" && (
-                  sortDirection === "asc" ? <ArrowUp className="ml-1 h-3 w-3" /> : <ArrowDown className="ml-1 h-3 w-3" />
-                )}
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                className={`text-xs h-7 ${sortBy === "price" ? "bg-gray-100" : ""}`}
-                onClick={() => toggleSort("price")}
-              >
-                Price {sortBy === "price" && (
-                  sortDirection === "asc" ? <ArrowUp className="ml-1 h-3 w-3" /> : <ArrowDown className="ml-1 h-3 w-3" />
-                )}
-              </Button>
+            <div className="flex gap-2 items-center">
+              <span className="text-xs text-muted-foreground">Sort by:</span>
+              <ToggleGroup type="multiple">
+                <ToggleGroupItem 
+                  value="time" 
+                  aria-label="Sort by time" 
+                  size="sm"
+                  className={`text-xs h-7 flex items-center gap-1 ${sortOptions.time.active ? "bg-gray-100" : ""}`}
+                  onClick={() => toggleSort("time")}
+                >
+                  Time
+                  {sortOptions.time.active && (
+                    sortOptions.time.direction === "asc" 
+                      ? <ArrowUp className="h-3 w-3" /> 
+                      : <ArrowDown className="h-3 w-3" />
+                  )}
+                </ToggleGroupItem>
+                
+                <ToggleGroupItem 
+                  value="price" 
+                  aria-label="Sort by price"
+                  size="sm"
+                  className={`text-xs h-7 flex items-center gap-1 ${sortOptions.price.active ? "bg-gray-100" : ""}`}
+                  onClick={() => toggleSort("price")}
+                >
+                  Price
+                  {sortOptions.price.active && (
+                    sortOptions.price.direction === "asc" 
+                      ? <ArrowUp className="h-3 w-3" /> 
+                      : <ArrowDown className="h-3 w-3" />
+                  )}
+                </ToggleGroupItem>
+              </ToggleGroup>
             </div>
           </div>
         </div>
@@ -192,7 +222,7 @@ const SearchPage = () => {
             <div>
               {filteredResults.map(({ instructor, timeSlot }) => (
                 <InstructorCard 
-                  key={timeSlot.id}
+                  key={`${instructor.id}-${timeSlot.id}`}
                   instructor={instructor} 
                   timeSlot={timeSlot}
                 />

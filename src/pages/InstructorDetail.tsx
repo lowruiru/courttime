@@ -151,7 +151,51 @@ const InstructorDetail = () => {
                   <p>{instructor.bio}</p>
                 </div>
                 
-                {/* Availability Section - Redesigned */}
+                {/* Reviews Section - Moved up above availability */}
+                <div className="mt-8">
+                  <h2 className="text-xl font-semibold mb-4">Reviews & Ratings</h2>
+                  <div className="space-y-6">
+                    {instructor.reviews.length > 0 ? (
+                      instructor.reviews.map((review) => (
+                        <div key={review.id} className="border-b pb-4 last:border-0">
+                          <div className="flex justify-between">
+                            <div className="font-medium">{review.userName}</div>
+                            <div className="flex text-tennis-yellow">
+                              {[...Array(5)].map((_, i) => (
+                                <span key={i}>
+                                  {i < Math.floor(review.rating) ? "★" : "☆"}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="text-sm text-muted-foreground mb-2">
+                            {review.date}
+                          </div>
+                          <p className="text-sm">{review.comment}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No reviews yet.</p>
+                    )}
+                  </div>
+                  
+                  {/* Google Sign In Button for Feedback */}
+                  <div className="mt-8 text-center">
+                    <button
+                      className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 transition text-sm w-full"
+                      onClick={() => window.location.href = "https://accounts.google.com/signin"}
+                    >
+                      <img
+                        src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                        alt="Google"
+                        className="h-5 w-5"
+                      />
+                      <span>Sign in with Google to submit feedback</span>
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Availability Section - Redesigned and moved below reviews */}
                 <div className="mt-8">
                   <h2 className="text-xl font-semibold mb-4">Upcoming Availability</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -165,7 +209,7 @@ const InstructorDetail = () => {
                         
                         return (
                           <div 
-                            key={slot.id}
+                            key={`avail-${slot.id}`}
                             className="bg-white border rounded-md overflow-hidden hover:shadow-md transition-shadow"
                           >
                             <div className="bg-gray-50 p-2 border-b">
@@ -211,49 +255,22 @@ const InstructorDetail = () => {
             </Card>
           </div>
           
-          {/* Reviews Section */}
+          {/* Sidebar content removed as Reviews section has been moved above availability */}
           <div className="lg:col-span-1">
             <Card>
               <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Reviews & Ratings</h2>
-                <div className="space-y-6">
-                  {instructor.reviews.length > 0 ? (
-                    instructor.reviews.map((review) => (
-                      <div key={review.id} className="border-b pb-4 last:border-0">
-                        <div className="flex justify-between">
-                          <div className="font-medium">{review.userName}</div>
-                          <div className="flex text-tennis-yellow">
-                            {[...Array(5)].map((_, i) => (
-                              <span key={i}>
-                                {i < Math.floor(review.rating) ? "★" : "☆"}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="text-sm text-muted-foreground mb-2">
-                          {review.date}
-                        </div>
-                        <p className="text-sm">{review.comment}</p>
-                      </div>
-                    ))
-                  ) : (
-                    <p>No reviews yet.</p>
-                  )}
-                </div>
-                 {/* Google Sign In Button for Feedback */}
-                <div className="mt-8 text-center">
-                  <button
-                    className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 transition text-sm w-full"
-                    onClick={() => window.location.href = "https://accounts.google.com/signin"}
-                  >
-                    <img
-                      src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                      alt="Google"
-                      className="h-5 w-5"
-                    />
-                    <span>Sign in with Google to submit feedback</span>
-                  </button>
-                </div>
+                <h2 className="text-xl font-semibold mb-4">Need Help?</h2>
+                <p className="text-sm mb-4">
+                  Contact our support team if you need assistance with booking a lesson or have any questions.
+                </p>
+                <Button 
+                  className="w-full bg-tennis-green hover:bg-tennis-green/90"
+                  asChild
+                >
+                  <a href="mailto:support@tennisapp.com">
+                    Contact Support
+                  </a>
+                </Button>
               </CardContent>
             </Card>
           </div>

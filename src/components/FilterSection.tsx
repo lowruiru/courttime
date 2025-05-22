@@ -91,19 +91,35 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
   return (
     <div>
       <div className="flex justify-between items-center mb-3">
-        <h2 className="text-base font-semibold">Find Your Tennis Instructor</h2>
+        <div className="flex items-center space-x-4">
+          <h2 className="text-base font-semibold">Find Your Tennis Instructor</h2>
+          <div className="flex items-center gap-2">
+            <Switch
+              id="needsCourt"
+              checked={filters.needsCourt}
+              onCheckedChange={(checked) => handleFilterChange("needsCourt", checked)}
+              className="h-4"
+            />
+            <Label htmlFor="needsCourt" className="text-xs">Needs Court</Label>
+          </div>
+        </div>
         <div className="flex items-center gap-2">
-          <Label htmlFor="needsCourt" className="text-xs">Need Court</Label>
-          <Switch
-            id="needsCourt"
-            checked={filters.needsCourt}
-            onCheckedChange={(checked) => handleFilterChange("needsCourt", checked)}
-            className="h-4"
-          />
+          <div className="space-y-1">
+            <Label htmlFor="budget" className="text-xs">Budget: S${filters.budget}</Label>
+            <Slider
+              id="budget"
+              value={[filters.budget]}
+              min={30}
+              max={200}
+              step={10}
+              onValueChange={(value) => handleFilterChange("budget", value[0])}
+              className="w-36"
+            />
+          </div>
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
         {/* 1. Search by Instructor Name */}
         <div className="space-y-1">
           <Label htmlFor="instructorName" className="text-xs">Instructor Name</Label>
@@ -121,7 +137,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
 
         {/* 2. Date Selection */}
         <div className="space-y-1">
-          <Label htmlFor="date" className="text-xs">Available Dates</Label>
+          <Label htmlFor="date" className="text-xs">Date</Label>
           <div className="flex h-8 space-x-1">
             <Button
               variant="outline" 
@@ -170,7 +186,9 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
 
         {/* 3. Time Range */}
         <div className="space-y-1">
-          <Label htmlFor="timeRange" className="text-xs">Time: {filters.timeRange[0].toString().padStart(2, '0')}:00 - {filters.timeRange[1].toString().padStart(2, '0')}:00</Label>
+          <Label htmlFor="timeRange" className="text-xs">
+            Time: {filters.timeRange[0].toString().padStart(2, '0')}:00 - {filters.timeRange[1].toString().padStart(2, '0')}:00
+          </Label>
           <Slider
             id="timeRange"
             value={filters.timeRange}
@@ -270,22 +288,6 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
               ))}
             </SelectContent>
           </Select>
-        </div>
-
-        {/* 6. Budget */}
-        <div className="space-y-1">
-          <div className="flex justify-between">
-            <Label htmlFor="budget" className="text-xs">Budget: S${filters.budget}</Label>
-          </div>
-          <Slider
-            id="budget"
-            value={[filters.budget]}
-            min={30}
-            max={200}
-            step={10}
-            onValueChange={(value) => handleFilterChange("budget", value[0])}
-            className="py-2"
-          />
         </div>
       </div>
       
