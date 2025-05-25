@@ -293,7 +293,7 @@ const SearchPage = () => {
                     className="h-4"
                   />
                   <Label htmlFor="showAvailableOnly" className="text-xs whitespace-nowrap">
-                    Show available lessons only
+                    Show available classes only
                   </Label>
                 </div>
               </div>
