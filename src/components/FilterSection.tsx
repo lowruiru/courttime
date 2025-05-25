@@ -1,28 +1,30 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
-import { format, addDays } from "date-fns";
-import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar as CalendarIcon, RotateCcw } from "lucide-react";
+import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { FilterOptions, Levels, NeighborhoodsByRegion, AllNeighborhoods } from "@/types/instructor";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Badge } from "@/components/ui/badge";
-import { CheckIcon, X } from "lucide-react";
+import { FilterOptions } from "@/types/instructor";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+
+const locations = [
+  "Yio Chu Kang",
+  "Bishan",
+  "Yishun",
+  "Sengkang",
+  "Punggol",
+  "Pasir Ris",
+  "Tampines",
+  "Marine Parade",
+  "Queenstown",
+  "Bukit Batok",
+  "Woodlands",
+];
 
 interface FilterSectionProps {
   onFilterChange: (filters: FilterOptions) => void;
@@ -31,284 +33,219 @@ interface FilterSectionProps {
 
 const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) => {
   const [filters, setFilters] = useState<FilterOptions>(activeFilters);
-  const [locationCommandOpen, setLocationCommandOpen] = useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const isMobile = useIsMobile();
-
-  // Effect to apply filter changes automatically
-  useEffect(() => {
-    // Debounce to avoid too many updates
-    const timer = setTimeout(() => {
-      onFilterChange(filters);
-    }, 300);
-    
-    return () => clearTimeout(timer);
-  }, [filters, onFilterChange]);
-
-  const handleFilterChange = (key: keyof FilterOptions, value: any) => {
-    const newFilters = { ...filters, [key]: value };
-    setFilters(newFilters);
-  };
-
-  const applyFilters = () => {
-    onFilterChange(filters);
-  };
   
-  const resetFilters = () => {
-    // Set date to today
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const defaultFilters: FilterOptions = {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const handleFilterUpdate = (updatedFilters: FilterOptions) => {
+    setFilters(updatedFilters);
+    onFilterChange(updatedFilters);
+  };
+
+  const handleLocationChange = (location: string[]) => {
+    const updatedFilters = { ...filters, location };
+    setFilters(updatedFilters);
+    handleFilterUpdate(updatedFilters);
+  };
+
+  const handleReset = () => {
+    const resetFilters: FilterOptions = {
       instructorName: "",
       location: [],
       budget: 200,
       level: "",
       needsCourt: false,
-      date: today, // Set default to today
-      timeRange: [6, 22]
+      date: today,
+      timeRange: [6, 22],
     };
-    setFilters(defaultFilters);
-    onFilterChange(defaultFilters);
+    setFilters(resetFilters);
+    onFilterChange(resetFilters);
   };
 
-  const toggleLocation = (location: string) => {
-    const newLocations = filters.location.includes(location)
-      ? filters.location.filter(l => l !== location)
-      : [...filters.location, location];
-    handleFilterChange("location", newLocations);
-  };
-
-  const removeLocation = (location: string) => {
-    const newLocations = filters.location.filter(l => l !== location);
-    handleFilterChange("location", newLocations);
-  };
-
-  const goToPreviousDay = () => {
-    if (filters.date) {
-      const newDate = addDays(filters.date, -1);
-      handleFilterChange("date", newDate);
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+      const updatedFilters = { ...filters, date };
+      setFilters(updatedFilters);
+      handleFilterUpdate(updatedFilters);
+      setIsCalendarOpen(false);
     }
-  };
-
-  const goToNextDay = () => {
-    if (filters.date) {
-      const newDate = addDays(filters.date, 1);
-      handleFilterChange("date", newDate);
-    } else {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      handleFilterChange("date", today);
-    }
-  };
-
-  // Format time for display in 24h format with leading zeros
-  const formatTime = (hour: number) => {
-    return `${hour.toString().padStart(2, '0')}:00`;
   };
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-3">
-        <div className="flex items-center space-x-4">
-          <h2 className="text-base font-semibold">Find a Tennis Instructor</h2>
-          <div className="flex items-center gap-2">
-            <Switch
-              id="needsCourt"
-              checked={filters.needsCourt}
-              onCheckedChange={(checked) => handleFilterChange("needsCourt", checked)}
-              className="h-4"
-            />
-            <Label htmlFor="needsCourt" className="text-xs">I need a court</Label>
-          </div>
-        </div>
-      </div>
-      
-      <div className={`grid ${isMobile ? 'grid-cols-1 gap-3' : 'grid-cols-12 gap-2'} items-center`}>
-        {/* Date Selection */}
-        <div className={`space-y-1 ${isMobile ? '' : 'col-span-2'}`}>
-          <Label htmlFor="date" className="text-xs">Date</Label>
-          <div className="flex h-8 space-x-1">
-            <Button
-              variant="outline" 
-              size="icon" 
-              className="h-8 w-8"
-              onClick={goToPreviousDay}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  id="date"
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal h-8 text-xs px-2",
-                    !filters.date && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-1 h-3 w-3" />
-                  {filters.date ? format(filters.date, "MMM d") : <span>Pick</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={filters.date}
-                  onSelect={(date) => handleFilterChange("date", date)}
-                  initialFocus
-                  className={cn("p-3 pointer-events-auto")}
-                />
-              </PopoverContent>
-            </Popover>
-            
-            <Button
-              variant="outline" 
-              size="icon"
-              className="h-8 w-8"
-              onClick={goToNextDay}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Time Range - Made same width as Budget */}
-        <div className={`space-y-1 ${isMobile ? '' : 'col-span-2'}`}>
-          <Label htmlFor="timeRange" className="text-xs">Time: {formatTime(filters.timeRange[0])} - {formatTime(filters.timeRange[1])}</Label>
-          <Slider
-            id="timeRange"
-            value={[filters.timeRange[0], filters.timeRange[1]]}
-            min={6}
-            max={22}
-            step={1}
-            onValueChange={([start, end]) => handleFilterChange("timeRange", [start, end])}
-            className="py-2"
-          />
-        </div>
-        
-        {/* Location */}
-        <div className={`space-y-1 ${isMobile ? '' : 'col-span-2'}`}>
-          <Label htmlFor="location" className="text-xs">Location</Label>
-          <Popover open={locationCommandOpen} onOpenChange={setLocationCommandOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={locationCommandOpen}
-                className="h-8 w-full justify-between text-xs overflow-hidden whitespace-nowrap"
-              >
-                {filters.location.length > 0
-                  ? `${filters.location.length} selected`
-                  : "All locations"}
-                <ChevronRight className="ml-1 h-4 w-4 shrink-0 rotate-90 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[220px] p-0" align="start">
-              <Command>
-                <CommandInput placeholder="Search locations..." className="h-8" />
-                <CommandList>
-                  <CommandEmpty>No locations found.</CommandEmpty>
-                  {Object.entries(NeighborhoodsByRegion).map(([region, neighborhoods]) => (
-                    <CommandGroup key={region} heading={region}>
-                      {neighborhoods.map((neighborhood) => (
-                        <CommandItem
-                          key={neighborhood}
-                          value={neighborhood}
-                          onSelect={() => toggleLocation(neighborhood)}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className={cn(
-                              "h-4 w-4 border rounded flex items-center justify-center",
-                              filters.location.includes(neighborhood) ? "bg-primary border-primary" : "border-input"
-                            )}>
-                              {filters.location.includes(neighborhood) && (
-                                <CheckIcon className="h-3 w-3 text-primary-foreground" />
-                              )}
-                            </div>
-                            <span>{neighborhood}</span>
-                          </div>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  ))}
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-          {filters.location.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-1">
-              {filters.location.slice(0, 1).map((location) => (
-                <Badge key={location} variant="outline" className="text-[10px] h-5 px-1">
-                  {location}
-                  <X 
-                    className="h-3 w-3 ml-1 cursor-pointer" 
-                    onClick={() => removeLocation(location)}
-                  />
-                </Badge>
-              ))}
-              {filters.location.length > 1 && (
-                <Badge variant="outline" className="text-[10px] h-5 px-1">
-                  +{filters.location.length - 1} more
-                </Badge>
-              )}
-            </div>
-          )}
-        </div>
-        
-        {/* Level */}
-        <div className={`space-y-1 ${isMobile ? '' : 'col-span-2'}`}>
-          <Label htmlFor="level" className="text-xs">Level</Label>
-          <Select
-            value={filters.level}
-            onValueChange={(value) => handleFilterChange("level", value)}
-          >
-            <SelectTrigger id="level" className="h-8 text-xs">
-              <SelectValue placeholder="All levels" />
+    <div className="space-y-4">
+      {/* First Row - Location and Budget */}
+      <div className={`grid ${isMobile ? "grid-cols-1" : "grid-cols-2"} gap-4`}>
+        {/* Location Filter */}
+        <div className="space-y-2">
+          <Label className="text-xs font-medium">Location</Label>
+          <Select onValueChange={(value) => handleLocationChange(value === "all" ? [] : [value])}>
+            <SelectTrigger className="w-full h-9 text-xs">
+              <SelectValue placeholder="Any" />
             </SelectTrigger>
-            <SelectContent align="start">
-              <SelectItem value="all_levels">All Levels</SelectItem>
-              {Levels.map((level) => (
-                <SelectItem key={level} value={level}>
-                  {level}
+            <SelectContent>
+              <SelectItem value="all">Any</SelectItem>
+              {locations.map((location) => (
+                <SelectItem key={location} value={location}>
+                  {location}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
 
-        {/* Budget - Made same width as Time */}
-        <div className={`space-y-1 ${isMobile ? '' : 'col-span-2'}`}>
-          <Label htmlFor="budget" className="text-xs">Budget: S${filters.budget}</Label>
+        {/* Budget Filter */}
+        <div className="space-y-2">
+          <Label className="text-xs font-medium">Budget (S$/hr)</Label>
           <Slider
-            id="budget"
-            value={[filters.budget]}
-            min={30}
+            defaultValue={[filters.budget]}
             max={200}
             step={10}
-            onValueChange={(value) => handleFilterChange("budget", value[0])}
-            className="py-2"
+            onValueChange={(value) => {
+              const updatedFilters = { ...filters, budget: value[0] };
+              setFilters(updatedFilters);
+              handleFilterUpdate(updatedFilters);
+            }}
+          />
+          <Input
+            type="number"
+            value={filters.budget}
+            onChange={(e) => {
+              const budget = parseInt(e.target.value);
+              if (!isNaN(budget)) {
+                const updatedFilters = { ...filters, budget };
+                setFilters(updatedFilters);
+                handleFilterUpdate(updatedFilters);
+              }
+            }}
+            className="mt-2 h-8 text-xs"
           />
         </div>
-        
-        {/* Action Buttons with Search Button before Reset Button */}
-        <div className={`flex gap-2 ${isMobile ? 'w-full' : 'col-span-2'}`}>
-          <Button 
-            size="sm" 
-            className="bg-tennis-green hover:bg-tennis-green/90 h-8 text-xs flex-1" 
-            onClick={applyFilters}
-          >
-            Search
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={resetFilters} 
-            className="h-8 text-xs flex-1"
-          >
-            Reset
-          </Button>
+      </div>
+
+      {/* Second Row - Level, Court, Date, Time */}
+      <div className={`grid ${isMobile ? "grid-cols-1" : "grid-cols-4"} gap-4`}>
+        {/* Level Filter */}
+        <div className="space-y-2">
+          <Label className="text-xs font-medium">Level</Label>
+          <Select onValueChange={(value) => {
+            const updatedFilters = { ...filters, level: value };
+            setFilters(updatedFilters);
+            handleFilterUpdate(updatedFilters);
+          }}>
+            <SelectTrigger className="w-full h-9 text-xs">
+              <SelectValue placeholder="Any" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all_levels">Any</SelectItem>
+              <SelectItem value="beginner">Beginner</SelectItem>
+              <SelectItem value="intermediate">Intermediate</SelectItem>
+              <SelectItem value="advanced">Advanced</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
+
+        {/* Court Filter */}
+        <div className="space-y-2">
+          <Label className="text-xs font-medium">Court</Label>
+          <div className="flex items-center space-x-2 mt-1">
+            <Button
+              variant={filters.needsCourt ? "default" : "outline"}
+              onClick={() => {
+                const updatedFilters = { ...filters, needsCourt: !filters.needsCourt };
+                setFilters(updatedFilters);
+                handleFilterUpdate(updatedFilters);
+              }}
+              className="text-xs h-8"
+            >
+              {filters.needsCourt ? "Instructor provides" : "I need a court"}
+            </Button>
+          </div>
+        </div>
+
+        {/* Date Filter */}
+        <div className="space-y-2">
+          <Label className="text-xs font-medium">Date</Label>
+          <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full justify-start text-left font-normal h-9 text-xs",
+                  !filters.date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-3 w-3" />
+                {filters.date ? format(filters.date, "MMM d, yyyy") : "Select date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={filters.date}
+                onSelect={handleDateSelect}
+                disabled={(date) => date < today}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        {/* Time Range Filter */}
+        <div className="space-y-2">
+          <Label className="text-xs font-medium">Time Range</Label>
+          <div className="flex items-center space-x-2">
+            <Input
+              type="number"
+              placeholder="From"
+              value={filters.timeRange[0]}
+              onChange={(e) => {
+                const fromTime = parseInt(e.target.value);
+                if (!isNaN(fromTime)) {
+                  const updatedFilters = { ...filters, timeRange: [fromTime, filters.timeRange[1]] };
+                  setFilters(updatedFilters);
+                  handleFilterUpdate(updatedFilters);
+                }
+              }}
+              className="w-16 h-8 text-xs"
+            />
+            <span className="mx-1 text-gray-500">to</span>
+            <Input
+              type="number"
+              placeholder="To"
+              value={filters.timeRange[1]}
+              onChange={(e) => {
+                const toTime = parseInt(e.target.value);
+                if (!isNaN(toTime)) {
+                  const updatedFilters = { ...filters, timeRange: [filters.timeRange[0], toTime] };
+                  setFilters(updatedFilters);
+                  handleFilterUpdate(updatedFilters);
+                }
+              }}
+              className="w-16 h-8 text-xs"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex gap-2 pt-2">
+        <Button 
+          onClick={() => handleFilterUpdate(filters)} 
+          className="bg-tennis-green hover:bg-tennis-green/90 text-xs h-8"
+        >
+          Search
+        </Button>
+        <Button 
+          variant="outline" 
+          onClick={handleReset}
+          className="text-xs h-8"
+        >
+          <RotateCcw className="mr-1 h-3 w-3" />
+          Reset
+        </Button>
       </div>
     </div>
   );

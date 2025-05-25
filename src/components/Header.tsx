@@ -1,71 +1,38 @@
 
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import React, { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
-// Modal component for instructor sign up
-const InstructorSignupModal: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => {
-  const [submitted, setSubmitted] = useState(false);
+const Header = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    if (!name || !email) {
+      toast({
+        title: "Information required",
+        description: "Please provide both name and email.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Thank you for signing up!",
+      description: "We will contact you soon with more information.",
+    });
+
+    setName("");
+    setEmail("");
+    setIsOpen(false);
   };
-
-  if (!open) return null;
-
-  return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative">
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 text-gray-400 hover:text-tennis-green text-xl"
-          aria-label="Close"
-        >
-          &times;
-        </button>
-        <h2 className="text-2xl font-semibold text-center text-tennis-green mb-4">Instructor Sign Up</h2>
-        {!submitted ? (
-          <form id="instructor-signup-form" onSubmit={handleSubmit}>
-            <label htmlFor="name" className="block mt-4 text-tennis-green text-sm">Full Name</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              required
-              autoComplete="name"
-              className="w-full border border-tennis-green rounded px-3 py-2 mt-1 text-sm"
-            />
-
-            <label htmlFor="email" className="block mt-4 text-tennis-green text-sm">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              required
-              autoComplete="email"
-              className="w-full border border-tennis-green rounded px-3 py-2 mt-1 text-sm"
-            />
-
-            <button
-              type="submit"
-              className="mt-6 w-full py-2 bg-tennis-green text-white rounded hover:bg-green-700 text-base"
-            >
-              Sign Up
-            </button>
-          </form>
-        ) : (
-          <div className="text-tennis-green text-center mt-6">
-            Thank you for signing up! We will contact you soon.
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-const Header = () => {
-  const [showSignup, setShowSignup] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm py-2">
@@ -76,15 +43,60 @@ const Header = () => {
           </div>
           <span className="text-sm font-bold text-tennis-green">Court Time</span>
         </Link>
-        <Button
-          variant="outline"
-          size="sm"
-          className="border-tennis-green text-tennis-green hover:bg-tennis-green hover:text-white text-xs h-7 z-50"
-          onClick={() => setShowSignup(true)}
-        >
-          List your classes with us
-        </Button>
-        <InstructorSignupModal open={showSignup} onClose={() => setShowSignup(false)} />
+        
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-tennis-green text-tennis-green hover:bg-tennis-green hover:text-white text-xs h-7 z-50"
+            >
+              List your classes with us
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>List your classes with us</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Join our platform and start teaching tennis. We'll help you connect with students in your area.
+              </p>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="instructor-name">Full Name</Label>
+                  <Input
+                    id="instructor-name"
+                    type="text"
+                    placeholder="Your full name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="instructor-email">Email</Label>
+                  <Input
+                    id="instructor-email"
+                    type="email"
+                    placeholder="your.email@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <Button type="submit" className="flex-1">
+                    Sign Up
+                  </Button>
+                  <Button type="button" variant="outline" onClick={() => setIsOpen(false)} className="flex-1">
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </header>
   );
