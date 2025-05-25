@@ -9,7 +9,6 @@ import { useToast } from "@/hooks/use-toast";
 
 const Header = () => {
   const [showSignup, setShowSignup] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const { toast } = useToast();
@@ -25,19 +24,18 @@ const Header = () => {
       return;
     }
 
-    setSubmitted(true);
+    // Close the modal immediately
+    setShowSignup(false);
+    
+    // Show success toast
     toast({
       title: "Thank you for signing up!",
       description: "We will contact you soon with more information.",
     });
 
-    // Reset form after a delay
-    setTimeout(() => {
-      setSubmitted(false);
-      setName("");
-      setEmail("");
-      setShowSignup(false);
-    }, 2000);
+    // Reset form
+    setName("");
+    setEmail("");
   };
 
   return (
@@ -62,54 +60,44 @@ const Header = () => {
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>Instructor Sign Up</DialogTitle>
+              <DialogTitle>Share your contact with us</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              {!submitted ? (
-                <>
-                  <p className="text-sm text-muted-foreground">
-                    Join our platform and start teaching tennis. We'll help you connect with students in your area.
-                  </p>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="instructor-name">Full Name</Label>
-                      <Input
-                        id="instructor-name"
-                        type="text"
-                        placeholder="Your full name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="instructor-email">Email</Label>
-                      <Input
-                        id="instructor-email"
-                        type="email"
-                        placeholder="your.email@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="flex gap-2 pt-2">
-                      <Button type="submit" className="flex-1">
-                        Sign Up
-                      </Button>
-                      <Button type="button" variant="outline" onClick={() => setShowSignup(false)} className="flex-1">
-                        Cancel
-                      </Button>
-                    </div>
-                  </form>
-                </>
-              ) : (
-                <div className="text-center py-4">
-                  <p className="text-tennis-green">
-                    Thank you for signing up! We will contact you soon.
-                  </p>
+              <p className="text-sm text-muted-foreground">
+                We will contact you soon with more information about listing your classes.
+              </p>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="instructor-name">Full Name</Label>
+                  <Input
+                    id="instructor-name"
+                    type="text"
+                    placeholder="Your full name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
                 </div>
-              )}
+                <div className="space-y-2">
+                  <Label htmlFor="instructor-email">Email</Label>
+                  <Input
+                    id="instructor-email"
+                    type="email"
+                    placeholder="your.email@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <Button type="submit" className="flex-1">
+                    Sign Up
+                  </Button>
+                  <Button type="button" variant="outline" onClick={() => setShowSignup(false)} className="flex-1">
+                    Cancel
+                  </Button>
+                </div>
+              </form>
             </div>
           </DialogContent>
         </Dialog>
