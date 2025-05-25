@@ -33,7 +33,7 @@ const SearchPage = () => {
     budget: 200,
     level: "",
     needsCourt: false,
-    date: today, // Set default date to today
+    date: today, // Set default to today
     timeRange: [6, 22]
   };
   
@@ -174,36 +174,37 @@ const SearchPage = () => {
         });
       }
       
-      // Apply multi-criteria sorting - ensure time sorting is always primary
+      // Apply sorting - only one sort option can be active at a time
       let sortedResults = [...results];
       
-      // Apply sorting with time as the primary sort (always active)
-      sortedResults.sort((a, b) => {
-        // First sort by date
-        const dateA = new Date(a.timeSlot.date);
-        const dateB = new Date(b.timeSlot.date);
-        
-        if (dateA.getTime() !== dateB.getTime()) {
+      if (sortOptions.price.active) {
+        // Sort by price only
+        sortedResults.sort((a, b) => {
+          return sortOptions.price.direction === "asc"
+            ? a.instructor.fee - b.instructor.fee
+            : b.instructor.fee - a.instructor.fee;
+        });
+      } else {
+        // Sort by time (default when price is not active)
+        sortedResults.sort((a, b) => {
+          // First sort by date
+          const dateA = new Date(a.timeSlot.date);
+          const dateB = new Date(b.timeSlot.date);
+          
+          if (dateA.getTime() !== dateB.getTime()) {
+            return sortOptions.time.direction === "asc" 
+              ? dateA.getTime() - dateB.getTime()
+              : dateB.getTime() - dateA.getTime();
+          }
+          
+          // If dates are the same, sort by time
+          const timeA = a.timeSlot.startTime;
+          const timeB = b.timeSlot.startTime;
           return sortOptions.time.direction === "asc" 
-            ? dateA.getTime() - dateB.getTime()
-            : dateB.getTime() - dateA.getTime();
-        }
-        
-        // If dates are the same, sort by time
-        const timeA = a.timeSlot.startTime;
-        const timeB = b.timeSlot.startTime;
-        const timeCompare = sortOptions.time.direction === "asc" 
-          ? timeA.localeCompare(timeB)
-          : timeB.localeCompare(timeA);
-        
-        // If times are different or price sorting is not active, return the time comparison
-        if (timeCompare !== 0 || !sortOptions.price.active) return timeCompare;
-        
-        // Then sort by price if active
-        return sortOptions.price.direction === "asc"
-          ? a.instructor.fee - b.instructor.fee
-          : b.instructor.fee - a.instructor.fee;
-      });
+            ? timeA.localeCompare(timeB)
+            : timeB.localeCompare(timeA);
+        });
+      }
       
       setFilteredResults(sortedResults);
       setNoResults(sortedResults.length === 0);
@@ -221,12 +222,24 @@ const SearchPage = () => {
     setSortOptions(prev => {
       const newOptions = { ...prev };
       
-      if (prev[type].active) {
-        // Toggle direction if already active
-        newOptions[type].direction = prev[type].direction === "asc" ? "desc" : "asc";
-      } else {
-        // Enable this sort option
-        newOptions[type].active = true;
+      if (type === "price") {
+        if (prev.price.active) {
+          // Toggle direction if already active
+          newOptions.price.direction = prev.price.direction === "asc" ? "desc" : "asc";
+        } else {
+          // Enable price sorting and disable time sorting
+          newOptions.price.active = true;
+          newOptions.time.active = false;
+        }
+      } else if (type === "time") {
+        if (prev.time.active) {
+          // Toggle direction if already active
+          newOptions.time.direction = prev.time.direction === "asc" ? "desc" : "asc";
+        } else {
+          // Enable time sorting and disable price sorting
+          newOptions.time.active = true;
+          newOptions.price.active = false;
+        }
       }
       
       return newOptions;
@@ -240,11 +253,6 @@ const SearchPage = () => {
       top: document.querySelector('.sticky')?.getBoundingClientRect().bottom || 0,
       behavior: 'smooth'
     });
-  };
-  
-  const handleInstructorSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newFilters = { ...filters, instructorName: e.target.value };
-    setFilters(newFilters);
   };
   
   return (
