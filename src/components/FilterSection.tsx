@@ -64,8 +64,8 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
       budget: 200,
       level: "",
       needsCourt: false,
-      date: today, // Set default to today
-      timeRange: [6, 22]
+      date: today,
+      timeRange: [6, 22] as [number, number]
     };
     setFilters(defaultFilters);
     onFilterChange(defaultFilters);
@@ -86,7 +86,12 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
   const goToPreviousDay = () => {
     if (filters.date) {
       const newDate = addDays(filters.date, -1);
-      handleFilterChange("date", newDate);
+      // Prevent selecting past dates
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (newDate >= today) {
+        handleFilterChange("date", newDate);
+      }
     }
   };
 
@@ -104,6 +109,13 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
   // Format time for display in 24h format with leading zeros
   const formatTime = (hour: number) => {
     return `${hour.toString().padStart(2, '0')}:00`;
+  };
+
+  // Check if a date should be disabled (past dates)
+  const isDateDisabled = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date < today;
   };
 
   return (
@@ -156,6 +168,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
                   mode="single"
                   selected={filters.date}
                   onSelect={(date) => handleFilterChange("date", date)}
+                  disabled={isDateDisabled}
                   initialFocus
                   className={cn("p-3 pointer-events-auto")}
                 />
@@ -182,7 +195,7 @@ const FilterSection = ({ onFilterChange, activeFilters }: FilterSectionProps) =>
             min={6}
             max={22}
             step={1}
-            onValueChange={([start, end]) => handleFilterChange("timeRange", [start, end])}
+            onValueChange={([start, end]) => handleFilterChange("timeRange", [start, end] as [number, number])}
             className="py-2"
           />
         </div>
