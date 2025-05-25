@@ -2,10 +2,11 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Instructor, TimeSlot } from "@/types/instructor";
-import { Calendar, Clock, MessageCircle, Bell } from "lucide-react";
+import { Calendar, Clock, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format, parse } from "date-fns";
 import { useIsMobile } from "@/hooks/use-mobile";
+import NotifyMeDialog from "./NotifyMeDialog";
 
 interface InstructorCardProps {
   instructor: Instructor;
@@ -77,15 +78,11 @@ const InstructorCard = ({ instructor, timeSlot, isAvailable = true }: Instructor
                       </a>
                     </Button>
                   ) : (
-                    <Button 
-                      className="bg-gray-400 hover:bg-gray-500 py-1 px-3 h-auto text-xs"
-                      asChild
-                    >
-                      <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
-                        <Bell className="mr-1 h-3 w-3" />
-                        Notify me
-                      </a>
-                    </Button>
+                    <NotifyMeDialog 
+                      instructorName={instructor.name}
+                      timeSlot={timeSlot.startTime}
+                      date={formattedDate}
+                    />
                   )}
                   <Button 
                     variant="outline"

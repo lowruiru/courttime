@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import FilterSection from "@/components/FilterSection";
@@ -20,6 +19,8 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 const RESULTS_PER_PAGE = 5;
 
@@ -42,6 +43,7 @@ const SearchPage = () => {
   const [filteredResults, setFilteredResults] = useState<{ instructor: Instructor, timeSlot: TimeSlot, isAvailable: boolean }[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [noResults, setNoResults] = useState<boolean>(false);
+  const [showAvailableOnly, setShowAvailableOnly] = useState<boolean>(false);
   const [sortOptions, setSortOptions] = useState({
     time: { active: true, direction: "asc" as "asc" | "desc" }, // Set default to earliest first
     price: { active: false, direction: "asc" as "asc" | "desc" }
@@ -51,9 +53,14 @@ const SearchPage = () => {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   
+  // Apply availability filter
+  const finalResults = showAvailableOnly 
+    ? filteredResults.filter(result => result.isAvailable)
+    : filteredResults;
+  
   // Calculate total pages and paginate results
-  const totalPages = Math.ceil(filteredResults.length / RESULTS_PER_PAGE);
-  const paginatedResults = filteredResults.slice(
+  const totalPages = Math.ceil(finalResults.length / RESULTS_PER_PAGE);
+  const paginatedResults = finalResults.slice(
     (currentPage - 1) * RESULTS_PER_PAGE,
     currentPage * RESULTS_PER_PAGE
   );
@@ -259,19 +266,33 @@ const SearchPage = () => {
               <h2 className={`text-sm font-semibold whitespace-nowrap`}>
                 {isLoading 
                   ? "Searching for instructors..." 
-                  : "Available Instructors"
+                  : "All Instructors"
                 }
               </h2>
               
-              {/* Search bar moved back next to Available Instructors */}
-              <div className="relative">
-                <Input
-                  placeholder="Search instructor..."
-                  value={filters.instructorName || ""}
-                  onChange={handleInstructorSearch}
-                  className="h-8 text-xs pl-8 w-[200px]"
-                />
-                <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
+              {/* Search bar and availability filter */}
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <Input
+                    placeholder="Search instructor..."
+                    value={filters.instructorName || ""}
+                    onChange={handleInstructorSearch}
+                    className="h-8 text-xs pl-8 w-[200px]"
+                  />
+                  <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="showAvailableOnly"
+                    checked={showAvailableOnly}
+                    onCheckedChange={setShowAvailableOnly}
+                    className="h-4"
+                  />
+                  <Label htmlFor="showAvailableOnly" className="text-xs whitespace-nowrap">
+                    Show available lessons only
+                  </Label>
+                </div>
               </div>
             </div>
             
@@ -348,7 +369,7 @@ const SearchPage = () => {
                 </div>
                 
                 {/* Pagination */}
-                {filteredResults.length > RESULTS_PER_PAGE && (
+                {finalResults.length > RESULTS_PER_PAGE && (
                   <Pagination className="my-6">
                     <PaginationContent>
                       {currentPage > 1 && (
