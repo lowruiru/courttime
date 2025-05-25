@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import FilterSection from "@/components/FilterSection";
@@ -38,7 +39,7 @@ const SearchPage = () => {
   };
   
   const [filters, setFilters] = useState<FilterOptions>(defaultFilters);
-  const [filteredResults, setFilteredResults] = useState<{ instructor: Instructor, timeSlot: TimeSlot }[]>([]);
+  const [filteredResults, setFilteredResults] = useState<{ instructor: Instructor, timeSlot: TimeSlot, isAvailable: boolean }[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [noResults, setNoResults] = useState<boolean>(false);
   const [sortOptions, setSortOptions] = useState({
@@ -76,71 +77,94 @@ const SearchPage = () => {
     
     // Simulate API delay for realistic UX
     const timer = setTimeout(() => {
-      const results: { instructor: Instructor, timeSlot: TimeSlot }[] = [];
+      const results: { instructor: Instructor, timeSlot: TimeSlot, isAvailable: boolean }[] = [];
+      const currentTime = new Date();
+      const currentHour = currentTime.getHours();
       
-      // Create a set to track instructors already added for a specific date
-      // This ensures we display different instructors for each date filter
-      const instructorsAddedForDate = new Set<string>();
-      
-      instructors.forEach(instructor => {
+      // Get all instructors and create multiple entries per instructor for the filtered date
+      const availableInstructors = instructors.filter(instructor => {
         // Filter by name if specified
-        if (filters.instructorName && !instructor.name.toLowerCase().includes(filters.instructorName.toLowerCase())) return;
+        if (filters.instructorName && !instructor.name.toLowerCase().includes(filters.instructorName.toLowerCase())) return false;
         
         // Filter by budget
-        if (instructor.fee > filters.budget) return;
+        if (instructor.fee > filters.budget) return false;
         
         // Filter by location if specified
         if (filters.location.length > 0) {
           const hasMatch = instructor.location.some(loc => filters.location.includes(loc));
-          if (!hasMatch) return;
+          if (!hasMatch) return false;
         }
         
         // Filter by level if specified
-        if (filters.level && filters.level !== "all_levels" && !instructor.levels.includes(filters.level)) return;
+        if (filters.level && filters.level !== "all_levels" && !instructor.levels.includes(filters.level)) return false;
         
         // Filter by court availability if needed
-        if (filters.needsCourt && !instructor.providesOwnCourt) return;
+        if (filters.needsCourt && !instructor.providesOwnCourt) return false;
         
-        // Filter by date and time slots
-        const availableSlots = instructor.availability.filter(slot => {
-          // Skip booked slots
-          if (slot.booked) return false;
-          
-          // Filter by date if specified
-          if (filters.date) {
-            const slotDate = new Date(slot.date);
-            if (!isSameDay(slotDate, filters.date)) return false;
-          }
-          
-          // Filter by time range
-          const startHour = parseInt(slot.startTime.split(':')[0], 10);
-          return startHour >= filters.timeRange[0] && startHour <= filters.timeRange[1];
-        });
-        
-        // Only add this instructor if we haven't already added them for this date
-        // (if a date filter is applied)
-        if (filters.date && instructorsAddedForDate.has(instructor.id)) {
-          return;
-        }
-        
-        // Add instructor with each available time slot
-        if (availableSlots.length > 0) {
-          // If there's a date filter, mark this instructor as added
-          if (filters.date) {
-            instructorsAddedForDate.add(instructor.id);
-          }
-          
-          // For date filtering, just add the first available slot to show different instructors
-          if (filters.date) {
-            results.push({ instructor, timeSlot: availableSlots[0] });
-          } else {
-            // When not filtering by date, add all slots
-            availableSlots.forEach(slot => {
-              results.push({ instructor, timeSlot: slot });
-            });
-          }
-        }
+        return true;
       });
+
+      // If we have a date filter, ensure at least 5 different instructors
+      if (filters.date) {
+        // Shuffle instructors to get variety
+        const shuffledInstructors = [...availableInstructors].sort(() => Math.random() - 0.5);
+        const minInstructors = Math.max(5, Math.min(shuffledInstructors.length, 8));
+        const selectedInstructors = shuffledInstructors.slice(0, minInstructors);
+        
+        selectedInstructors.forEach(instructor => {
+          // Generate 1-3 time slots for each instructor on the filtered date
+          const slotsCount = Math.floor(Math.random() * 3) + 1;
+          
+          for (let i = 0; i < slotsCount; i++) {
+            let startHour = Math.floor(Math.random() * (filters.timeRange[1] - filters.timeRange[0])) + filters.timeRange[0];
+            
+            // If filtering by today's date, only show slots after current time
+            if (isSameDay(filters.date, currentTime)) {
+              startHour = Math.max(startHour, currentHour + 1);
+            }
+            
+            // Skip if hour is outside range
+            if (startHour > filters.timeRange[1]) continue;
+            
+            const endHour = startHour + 1;
+            const startTime = `${startHour.toString().padStart(2, '0')}:00`;
+            const endTime = `${endHour.toString().padStart(2, '0')}:00`;
+            const dateStr = filters.date.toISOString().split('T')[0];
+            
+            // Randomly make some slots unavailable (30% chance)
+            const isAvailable = Math.random() > 0.3;
+            
+            const timeSlot: TimeSlot = {
+              id: `generated-${instructor.id}-${dateStr}-${startHour}`,
+              date: dateStr,
+              startTime,
+              endTime,
+              location: instructor.location[Math.floor(Math.random() * instructor.location.length)],
+              booked: false
+            };
+            
+            results.push({ instructor, timeSlot, isAvailable });
+          }
+        });
+      } else {
+        // Original logic for when no date filter is applied
+        availableInstructors.forEach(instructor => {
+          const availableSlots = instructor.availability.filter(slot => {
+            // Skip booked slots
+            if (slot.booked) return false;
+            
+            // Filter by time range
+            const startHour = parseInt(slot.startTime.split(':')[0], 10);
+            return startHour >= filters.timeRange[0] && startHour <= filters.timeRange[1];
+          });
+          
+          availableSlots.forEach(slot => {
+            // Randomly make some slots unavailable (20% chance)
+            const isAvailable = Math.random() > 0.2;
+            results.push({ instructor, timeSlot: slot, isAvailable });
+          });
+        });
+      }
       
       // Apply multi-criteria sorting - ensure time sorting is always primary
       let sortedResults = [...results];
@@ -172,22 +196,6 @@ const SearchPage = () => {
           ? a.instructor.fee - b.instructor.fee
           : b.instructor.fee - a.instructor.fee;
       });
-      
-      // Always ensure we show at least one result no matter what
-      if (sortedResults.length === 0) {
-        // If no results, try to add a default result without filters
-        const availableInstructors = instructors.filter(instructor => 
-          instructor.availability.some(slot => !slot.booked)
-        );
-        
-        if (availableInstructors.length > 0) {
-          const instructor = availableInstructors[0];
-          const availableSlot = instructor.availability.find(slot => !slot.booked);
-          if (availableSlot) {
-            sortedResults.push({ instructor, timeSlot: availableSlot });
-          }
-        }
-      }
       
       setFilteredResults(sortedResults);
       setNoResults(sortedResults.length === 0);
@@ -329,11 +337,12 @@ const SearchPage = () => {
               // Results list with pagination - showing exactly 5 results per page
               <>
                 <div>
-                  {paginatedResults.map(({ instructor, timeSlot }, index) => (
+                  {paginatedResults.map(({ instructor, timeSlot, isAvailable }, index) => (
                     <InstructorCard 
                       key={`${instructor.id}-${timeSlot.id}-${index}`}
                       instructor={instructor} 
                       timeSlot={timeSlot}
+                      isAvailable={isAvailable}
                     />
                   ))}
                 </div>
