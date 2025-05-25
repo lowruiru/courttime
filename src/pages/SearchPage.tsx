@@ -90,8 +90,11 @@ const SearchPage = () => {
       
       // Get all instructors and create multiple entries per instructor for the filtered date
       const availableInstructors = instructors.filter(instructor => {
-        // Filter by name if specified
-        if (filters.instructorName && !instructor.name.toLowerCase().includes(filters.instructorName.toLowerCase())) return false;
+        // Filter by name if specified - make sure this works properly
+        if (filters.instructorName && filters.instructorName.trim() !== "") {
+          const nameMatch = instructor.name.toLowerCase().includes(filters.instructorName.toLowerCase().trim());
+          if (!nameMatch) return false;
+        }
         
         // Filter by budget
         if (instructor.fee > filters.budget) return false;
@@ -242,7 +245,8 @@ const SearchPage = () => {
   };
   
   const handleInstructorSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    handleFilterChange({ ...filters, instructorName: e.target.value });
+    const newFilters = { ...filters, instructorName: e.target.value };
+    setFilters(newFilters);
   };
   
   return (

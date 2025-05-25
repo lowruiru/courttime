@@ -166,10 +166,14 @@ const InstructorDetail = () => {
                         </div>
                       </div>
                       
-                      {/* Updated Specialization with new values */}
+                      {/* Updated Specialization with same style as levels */}
                       <div>
                         <h3 className="font-medium">Specialization</h3>
-                        <p>{instructor.specialization || "General tennis"}</p>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          <span className="px-2 py-1 bg-muted rounded-full text-xs">
+                            {instructor.specialization || "General tennis"}
+                          </span>
+                        </div>
                       </div>
                       
                       <div>
