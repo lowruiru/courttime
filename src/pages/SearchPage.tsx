@@ -275,8 +275,8 @@ const SearchPage = () => {
             <div className="flex items-center gap-3">
               <h2 className={`text-sm font-semibold whitespace-nowrap`}>
                 {isLoading 
-                  ? "Searching for instructors..." 
-                  : "All Instructors"
+                  ? "Searching for classes..." 
+                  : "All Classes"
                 }
               </h2>
               
