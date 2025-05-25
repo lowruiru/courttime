@@ -17,8 +17,6 @@ import {
   PaginationPrevious 
 } from "@/components/ui/pagination";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
@@ -277,13 +275,6 @@ const SearchPage = () => {
               {/* Search bar and availability filter */}
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <Input
-                    placeholder="Search instructor..."
-                    value={filters.instructorName || ""}
-                    onChange={handleInstructorSearch}
-                    className="h-8 text-xs pl-8 w-[200px]"
-                  />
-                  <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
                 </div>
                 
                 <div className="flex items-center gap-2">
